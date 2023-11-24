@@ -1,24 +1,20 @@
 
-##when running function for pi, the dimensions only match up if I don/t
-#transpose x, which is not what he specified - need to clarify
-#pf <- function(x, beta){
-  #out <- 1/(1 + exp(-t(x)%*%beta))
-  #return(out)
-#}
-
 pf <- function(x, beta){
-  out <- 1/(1 + exp(-(x)%*%beta))
+  out <- 1/(1 + exp(-t(x)%*%beta))
   return(out)
 }
+
+
+
 
 
 #need a matrix with first column as predictors, and second column as response as input
 beta_ls <- function(matrix, beta){
   sum <- 0
   for(i in 1:nrow(matrix)){
-    xi <- matrix[i,1:4]
+    xi <- as.matrix(unlist(matrix[i,1:4]), ncol = 1) #format it so dimensions work out later
     yi <- matrix[i,5]
-    pi <- pf(as.matrix(xi),as.matrix(beta))
+    pi <- pf(xi,as.matrix(beta))
     
     res <- (-1*yi)*(log10(pi)) - (1 - yi)*log10(1-pi)
     sum <- sum + res
@@ -29,7 +25,7 @@ beta_ls <- function(matrix, beta){
 
 
 ##generate random data 
-set.seed(123)
+#set.seed(123)
 x1 <- rnorm(100)
 x2 <- rnorm(100)
 x3 <- rnorm(100)
