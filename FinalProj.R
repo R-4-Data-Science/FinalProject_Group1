@@ -43,3 +43,33 @@ B_initial <- solve(t(X)%*%X)%*%t(X)%*%y
 
 test <- beta_ls(data,B_initial)
 result <- optim(par = B_initial, fn = beta_ls, matrix = data)
+
+
+
+
+
+## OUTLINE for bootstrap confidence intervals -- will need to be updated once logistic regression is complete
+
+
+
+bootstrap_conf_intervals <- function(X, y, alpha = 0.05, n_bootstraps = 20) {
+  n <- nrow(X)
+  beta_bootstraps <- matrix(NA, ncol = n_bootstraps, nrow = length(name_log_regressionfxn(X, y)))
+  
+  for (i in 1:n_bootstraps) {
+    # Sample with replacement
+    indices <- sample(1:n, replace = TRUE)
+    X_bootstrap <- X[indices, ]
+    y_bootstrap <- y[indices]
+    
+    # Run logistic regression on the bootstrap sample
+    beta_bootstraps[, i] <- namelogregressionfxn(X_bootstrap, y_bootstrap)
+  }
+  
+  # Calculate confidence intervals
+  lower <- apply(beta_bootstraps, 1, function(col) quantile(col, alpha / 2))
+  upper <- apply(beta_bootstraps, 1, function(col) quantile(col, 1 - alpha / 2))
+  
+  intervals <- data.frame(lower = lower, upper = upper)
+  return(intervals)
+}
