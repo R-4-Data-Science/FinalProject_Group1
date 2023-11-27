@@ -5,15 +5,12 @@ pf <- function(x, beta){
 }
 
 
-
-
-
 #need a matrix with first column as predictors, and second column as response as input
 beta_ls <- function(matrix, beta){
   sum <- 0
   for(i in 1:nrow(matrix)){
-    xi <- as.matrix(unlist(matrix[i,1:4]), ncol = 1) #format it so dimensions work out later
-    yi <- matrix[i,5]
+    xi <- as.matrix(unlist(matrix[i,1:(ncol(matrix)-1)]), ncol = 1) #format it so dimensions work out later
+    yi <- matrix[i,ncol(matrix)]
     pi <- pf(xi,as.matrix(beta))
     
     res <- (-1*yi)*(log10(pi)) - (1 - yi)*log10(1-pi)
@@ -22,6 +19,7 @@ beta_ls <- function(matrix, beta){
   return(sum)
 
 }
+
 
 
 ##generate random data 
@@ -44,7 +42,13 @@ B_initial <- solve(t(X)%*%X)%*%t(X)%*%y
 test <- beta_ls(data,B_initial)
 result <- optim(par = B_initial, fn = beta_ls, matrix = data)
 
+#provides the coefficient estimates
+result$par[1,] #betazero
+result$par[2,] #beta1
+result$par[3,] #beta2
+result$par[4,] #beta3
 
+ncol(data)
 
 
 
