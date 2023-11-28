@@ -24,10 +24,14 @@ beta_ls <- function(beta, x, y){
 log_reg <- function(X, y){
   B_initial <- solve(t(X)%*%X)%*%t(X)%*%y
   result <- optim(par = B_initial, fn = beta_ls, x = X, y = y)
+  out <- list("int" = result$par[1,], "b1" = result$par[2,], "b2" = result$par[3,], "b3" = result$par[4,])
+  class(out) <- "my_b"
   return(result$par)
 }
 
-
+plot.my_b <- function(obj){
+  plot(obj$X ~ obj$y)
+}
 
 
 ##generate random data 
@@ -51,8 +55,9 @@ result <- optim(par = B_initial, fn = beta_ls, x = X, y = y)
 
 log_reg(X,y)
 
-## OUTLINE for bootstrap confidence intervals -- will need to be updated once logistic regression is complete
 
+
+## OUTLINE for bootstrap confidence intervals -- will need to be updated once logistic regression is complete
 
 
 bootstrap_conf_intervals <- function(X, y, alpha = 0.05, n_bootstraps = 20) {
@@ -96,4 +101,15 @@ intervals <- bootstrap_conf_intervals(X, y)
 
 # Print the resulting intervals
 print(intervals)
+
+
+##logistic regression plot
+##plot dots from before transformation of XB (or y tilda)
+##plot line from after the transformation
+y_pred <- X%*%B_initial
+plot(y ~ y_pred ,xlim = range(y_pred), ylim = range(-.05, 1.5))
+x_line <- seq(min(y_pred), max(y_pred), length = 100)
+X_line <- cbind(1, x_line)
+y_line <- pf(t(X), B_initial)
+lines(x_line, sort(y_line), col = "red", lty = 1, lwd = 2)
 
