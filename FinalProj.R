@@ -6,22 +6,24 @@ pf <- function(x, beta){
 
 
 #need a matrix with first column as predictors, and second column as response as input
-beta_ls <- function(x, y, beta){
+beta_ls <- function(beta, x, y){
   sum <- 0
   for(i in 1:nrow(x)){
     xi <- as.matrix(unlist(x[i,]), ncol = 1) #format it so dimensions work out later
     yi <- y[i]
     pi <- pf(xi,as.matrix(beta))
     
-    res <- (-1*yi)*(log10(pi)) - (1 - yi)*log10(1-pi)
+    res <- (-1*yi)*(log(pi)) - (1 - yi)*log(1-pi)
     sum <- sum + res
   }
   return(sum)
 
 }
 
-
-
+log_reg <- function(X, y){
+  result <- optim(par = B_initial, fn = beta_ls, x = X, y = y)
+  return(result$par)
+}
 
 
 ##generate random data 
@@ -37,20 +39,13 @@ beta3 <- 1.5
 true_beta <- matrix(c(beta0, beta1, beta2, beta3), ncol = 1)
 p <- 1/(1 + exp(-(X%*%true_beta)))
 y <- rbinom(100,1,p)
-data <- data.frame(X, y)
 
 B_initial <- solve(t(X)%*%X)%*%t(X)%*%y
 
-test <- beta_ls(X,y,B_initial)
+test <- beta_ls(B_initial,X,y)
 result <- optim(par = B_initial, fn = beta_ls, x = X, y = y)
 
-#provides the coefficient estimates
-result$par[1,] #betazero
-result$par[2,] #beta1
-result$par[3,] #beta2
-result$par[4,] #beta3
-
-
+log_reg(X,y)
 
 ## OUTLINE for bootstrap confidence intervals -- will need to be updated once logistic regression is complete
 
