@@ -109,7 +109,33 @@ print(intervals)
 y_pred <- X%*%B_initial
 plot(y ~ y_pred ,xlim = range(y_pred), ylim = range(-.05, 1.5))
 x_line <- seq(min(y_pred), max(y_pred), length = 100)
-X_line <- cbind(1, x_line)
 y_line <- pf(t(X), B_initial)
 lines(x_line, sort(y_line), col = "red", lty = 1, lwd = 2)
+
+##confusion matrix function
+library(caret)
+confmat <- function(y_actual, y_pred, cutoff = 0.5){
+  #convert predicted values to 0 or 1 based on threshold
+  y_bin <- ifelse(y_pred >= cutoff, 1,0)
+  cmat <- confusionMatrix(factor(y), factor(y_bin))
+  metrics <- cmat$byClass
+  prevalence <- metrics["Prevalence"]
+  accuracy <- cmat$overall["Accuracy"]
+  sensitivity <- metrics["Sensitivity"]
+  specificity <- metrics["Specificity"]
+  true_p <- cmat$byClass["Pos Pred Value"] * cmat$byClass["Precision"]
+  false_p <- cmat$byClass["Neg Pred Value"] * cmat$byClass["Precision"]
+  false_discovery_rate <- as.numeric(false_p / (false_p + true_p))
+  formatted_fdr <- sprintf("%.7f", false_discovery_rate)
+  diagnostic_odds_ratio <- metrics["Diagnostic Odds Ratio"]
+  
+  out <- invisible(list(prevalence, accuracy, sensitivity, specificity, formatted_fdr, diagnostic_odds_ratio))
+  return(out)
+
+}
+
+confmat(y, y_pred)
+metrics <- cmat$byClass
+metrics["Prevalence"]
+
 
