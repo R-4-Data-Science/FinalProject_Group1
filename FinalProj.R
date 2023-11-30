@@ -174,7 +174,7 @@ plot_metrics <- function(X, y, cutoff_values = seq(0.1, 0.9, by = 0.1)) {
   for (i in seq_along(metrics_names)) {
     plot(metrics_matrix[, "Cutoff"], metrics_matrix[, i + 1], type = "l", col = i + 1,
          xlab = "Cutoff", ylab = metrics_names[i], main = paste("Metric vs. Cutoff"))
-    abline(h = max(metrics_matrix[, i + 1]), col = "red", lty = 2)
+ 
   }
 }
 
