@@ -216,7 +216,7 @@ confmat(y, y_pred)
 #' @examples
 plot_metrics <- function(X, y, cutoff_values = seq(0.1, 0.9, by = 0.1)) {
   result <- log_reg(X, y)$betas
-  predicted_probs <- pf(t(X), result$betas)
+  predicted_probs <- pf(t(X), result)
   metrics_matrix <- matrix(NA, nrow = length(cutoff_values), ncol = 7,
                            dimnames = list(NULL, c("Cutoff", "Prevalence", "Accuracy", "Sensitivity", "Specificity", "False Discovery Rate", "Diagnostic Odds Ratio")))
 
@@ -235,8 +235,6 @@ plot_metrics <- function(X, y, cutoff_values = seq(0.1, 0.9, by = 0.1)) {
 
   }
 }
-
-plot_metrics(X, y)
 
 
 

@@ -112,7 +112,7 @@ plot.my_b <- function(obj){
 ```
 
 Here we use the plot() function in this package
-```{r logplot}
+```{r logplot_abalone}
 plot(results)
 
 ```
@@ -145,11 +145,6 @@ bootstrap_conf_intervals <- function(X, y, alpha = 0.05, n_bootstraps = 20) {
 }
 
 
-# Bootstrap confidence intervals
-intervals <- bootstrap_conf_intervals(X, y)
-
-# Print the resulting intervals
-print(intervals)
 ```  
 
 For example, using the Abalone dataset with different measurements as predictors: 
@@ -237,7 +232,6 @@ plot_metrics <- function(X, y, cutoff_values = seq(0.1, 0.9, by = 0.1)) {
 ```
 Here is an example of this function being used with the above calculated metrics from the Abalone data set. 
 ```{r}
-
 plotmet <- plot_metrics(X_abalone, y_abalone)
 
 
