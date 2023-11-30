@@ -17,9 +17,24 @@ summary(data)
 
 
 ```{r, echo = FALSE}
+
 data <- as.data.frame(read.csv("abalone.data"), header = FALSE)
 colnames(data) <- c("Sex", "Length", "Diameter", "Height", "Whole_weight", "Shucked_weight", "Viscera_weight", "Shell_weight", "Rings")
 head(data)
+
+#remove infant columns so we have binary response variable
+data <- data[data$Sex != "I", ]
+
+#convert Male to 1 and Female to 0 
+data$Sex <- ifelse(data$Sex == "M", 1,0)
+
+y_abalone <- data$Sex
+x_columns <- c("Length", "Diameter", "Height", "Whole_weight", "Shucked_weight", "Viscera_weight", "Shell_weight", "Rings")
+X_abalone <- as.matrix(data[x_columns])
+##add a column of ones for the intercept
+X_abalone <- cbind(1, X_abalone)
+
+
 
 ```
 
@@ -52,6 +67,7 @@ The initial values for optimization were obtained from the least-squares formula
 
 ```{r logreg}
 log_reg <- function(X, y){
+  colnames(X)[1] <- "Intercept"
   B_initial <- solve(t(X)%*%X)%*%t(X)%*%y
   result <- optim(par = B_initial, fn = beta_ls, x = X, y = y)
   parameters <- result$par
@@ -65,7 +81,18 @@ log_reg <- function(X, y){
 
 ```
 
-Example using covid dataset 
+Example using Abalone Dataset
+The response variable is the sex, male denoted as 1 and female denoted with 0. The predictors used are length, diameter, height, whole weight, shucked weight, viscera weight, shell weight and rings. The output from this function returns the estimated beta coefficients for each of the predictors, including the intercept. 
+```{r abalone, echo = FALSE}
+results <- log_reg(X_abalone, y_abalone)
+results$betas
+
+```
+
+
+
+
+
 
 
 
