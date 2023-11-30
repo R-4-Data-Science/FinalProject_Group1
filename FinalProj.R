@@ -1,4 +1,4 @@
-#' @title Title of package here
+#' @title Title here
 #'
 #' @description This function delivers the value of the loss function for a given value of \code{beta}
 #' @param resp A \code{vector} of dimension n.
@@ -26,7 +26,18 @@ pf <- function(x, beta){
   return(out)
 }
 
-
+@description This function delivers the value of the loss function for a given value of \code{beta}
+#' @param resp A \code{vector} of dimension n.
+#' @param pred A \code{matrix} containing predictors.
+#' @param beta A \code{vector} containing coefficients.
+#' @param norm A \code{character} defining loss to use (default is `L2`).
+#' @return A \code{numeric} giving value of loss at \code{beta}
+#' @author Elena Gagliano
+#' @author Helen Wu
+#' @author Max Van Horn 
+#' @importFrom stats #put package and then fxn from package you rely on
+#' @export
+#' @examples
 #need a matrix with first column as predictors, and second column as response as input
 beta_ls <- function(beta, x, y){
   sum <- 0
@@ -43,6 +54,20 @@ beta_ls <- function(beta, x, y){
 
 }
 
+
+@description This function delivers the value of the loss function for a given value of \code{beta}
+#' @param resp A \code{vector} of dimension n.
+#' @param pred A \code{matrix} containing predictors.
+#' @param beta A \code{vector} containing coefficients.
+#' @param norm A \code{character} defining loss to use (default is `L2`).
+#' @return A \code{numeric} giving value of loss at \code{beta}
+#' @author Elena Gagliano
+#' @author Helen Wu
+#' @author Max Van Horn 
+#' @importFrom stats #put package and then fxn from package you rely on
+#' @export
+#' @examples
+#' 
 log_reg <- function(X, y){
   B_initial <- solve(t(X)%*%X)%*%t(X)%*%y
   result <- optim(par = B_initial, fn = beta_ls, x = X, y = y)
@@ -51,6 +76,19 @@ log_reg <- function(X, y){
   class(out) <- "my_b"
   return(result$par)
 }
+
+@description This function delivers the value of the loss function for a given value of \code{beta}
+#' @param resp A \code{vector} of dimension n.
+#' @param pred A \code{matrix} containing predictors.
+#' @param beta A \code{vector} containing coefficients.
+#' @param norm A \code{character} defining loss to use (default is `L2`).
+#' @return A \code{numeric} giving value of loss at \code{beta}
+#' @author Elena Gagliano
+#' @author Helen Wu
+#' @author Max Van Horn 
+#' @importFrom stats #put package and then fxn from package you rely on
+#' @export
+#' @examples
 
 plot.my_b <- function(obj){
   y_pred <- obj$y_pred
@@ -96,6 +134,18 @@ log_reg(X,y)
 
 ## OUTLINE for bootstrap confidence intervals -- will need to be updated once logistic regression is complete
 
+@description This function delivers the value of the loss function for a given value of \code{beta}
+#' @param resp A \code{vector} of dimension n.
+#' @param pred A \code{matrix} containing predictors.
+#' @param beta A \code{vector} containing coefficients.
+#' @param norm A \code{character} defining loss to use (default is `L2`).
+#' @return A \code{numeric} giving value of loss at \code{beta}
+#' @author Elena Gagliano
+#' @author Helen Wu
+#' @author Max Van Horn 
+#' @importFrom stats #put package and then fxn from package you rely on
+#' @export
+#' @examples
 
 bootstrap_conf_intervals <- function(X, y, alpha = 0.05, n_bootstraps = 20) {
   n <- nrow(X)
@@ -149,6 +199,19 @@ x_line <- seq(min(y_pred), max(y_pred), length = 100)
 y_line <- pf(t(X), B_initial)
 lines(x_line, sort(y_line), col = "red", lty = 1, lwd = 2)
 
+@description This function delivers the value of the loss function for a given value of \code{beta}
+#' @param resp A \code{vector} of dimension n.
+#' @param pred A \code{matrix} containing predictors.
+#' @param beta A \code{vector} containing coefficients.
+#' @param norm A \code{character} defining loss to use (default is `L2`).
+#' @return A \code{numeric} giving value of loss at \code{beta}
+#' @author Elena Gagliano
+#' @author Helen Wu
+#' @author Max Van Horn 
+#' @importFrom stats #put package and then fxn from package you rely on
+#' @export
+#' @examples
+
 ##confusion matrix function
 library(caret)
 confmat <- function(y_actual, y_pred, cutoff = 0.5){
@@ -175,7 +238,18 @@ confmat(y, y_pred)
 
 #plot metrics cut off grid 
 
-#cutoff_values <- seq(0.1, 0.9, by = 0.1)
+@description This function delivers the value of the loss function for a given value of \code{beta}
+#' @param resp A \code{vector} of dimension n.
+#' @param pred A \code{matrix} containing predictors.
+#' @param beta A \code{vector} containing coefficients.
+#' @param norm A \code{character} defining loss to use (default is `L2`).
+#' @return A \code{numeric} giving value of loss at \code{beta}
+#' @author Elena Gagliano
+#' @author Helen Wu
+#' @author Max Van Horn 
+#' @importFrom stats #put package and then fxn from package you rely on
+#' @export
+#' @examples
 
 # Function to plot metrics over a grid of cutoff values
 plot_metrics <- function(X, y, cutoff_values = seq(0.1, 0.9, by = 0.1)) {
