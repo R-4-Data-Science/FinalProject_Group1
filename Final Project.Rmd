@@ -1,0 +1,51 @@
+---
+title: "Final Project"
+output: html_document
+date: "2023-11-30"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Logistic Regression using optimization Vignette
+
+
+###*Initial values for optimization obtained from the least-squares formula (XTX)−1XTy*
+
+
+
+
+.
+### *Bootstrap Confidence intervals*
+  The user is able to choose (i) the significance level α to obtain for the 1−α confidence intervals for β, and (ii)    the number of bootstraps which by default is 20.
+  
+  
+  
+  
+### *Plot of the fitted logistic curve to the responses*
+
+The y -axis is the binary response y while the x-axis represents a sequence of values from the range of Xβ̂. 
+ (see this link or this link for inspiration).
+ 
+ 
+ 
+ 
+### *Generate resulting "Confusion Matrix”*
+
+This uses a cut-off value for prediction at 0.5 (i.e. assign value 1 for predictions above 0.5 and value 0 for prediction below or equal to 0.5). Based on this cut-off value, it also outputs the following metrics:
+Prevalence
+Accuracy
+Sensitivity
+Specificity
+False Discovery Rate
+Diagnostic Odds Ratio
+
+
+### *Plot above metrics over a grid*
+
+The possibility for the user to plot of any of the above metrics evaluated over a grid of cut-off values for prediction going from 0.1 to 0.9 with steps of 0.1.
+
+### *Include Help documentation for all functions*
+
+
