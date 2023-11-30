@@ -15,6 +15,14 @@ data$Outcome <- ifelse(data$Outcome == "Healed", 1, 0)
 summary(data)
 ```
 
+
+```{r, echo = FALSE}
+data <- as.data.frame(read.csv("abalone.data"), header = FALSE)
+colnames(data) <- c("Sex", "Length", "Diameter", "Height", "Whole_weight", "Shucked_weight", "Viscera_weight", "Shell_weight", "Rings")
+head(data)
+
+```
+
 ## *Beta Loss function to prepare for logistic regression function*
 ```{r loss}
 pf <- function(x, beta){
