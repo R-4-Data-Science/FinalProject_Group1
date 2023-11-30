@@ -8,6 +8,11 @@ date: "2023-11-30"
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+```{r, echo=FALSE}
+data <- read.csv("covid.csv")
+summary(data)
+```
+
 ## Logistic Regression using optimization Vignette
 
 
@@ -50,6 +55,23 @@ intervals <- bootstrap_conf_intervals(X, y)
 # Print the resulting intervals
 print(intervals)
 ```  
+
+For example, using the covid dataset with symptoms as a predictor: 
+
+```{r bootstrap example}
+set.seed(123)  
+
+# Extract predictors and response variable
+X <- cbind(1, data[, colnames(data) != "y"])  # Replace "x1", "x2", "x3" with actual column names
+y <- data$y
+
+# Bootstrap confidence intervals
+intervals <- bootstrap_conf_intervals(X, y)
+
+# Print the resulting intervals
+print(intervals)
+```
+
   
 ### *Plot of the fitted logistic curve to the responses*
 
