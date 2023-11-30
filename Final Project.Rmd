@@ -20,8 +20,36 @@ knitr::opts_chunk$set(echo = TRUE)
 ### *Bootstrap Confidence intervals*
   The user is able to choose (i) the significance level α to obtain for the 1−α confidence intervals for β, and (ii)    the number of bootstraps which by default is 20.
   
-  
-  
+```{r bootstrap}
+bootstrap_conf_intervals <- function(X, y, alpha = 0.05, n_bootstraps = 20) {
+  n <- nrow(X)
+  beta_bootstraps <- matrix(NA, ncol = n_bootstraps, nrow = length(log_reg(X, y)))
+
+  for (i in 1:n_bootstraps) {
+    # Sample with replacement
+    indices <- sample(1:n, replace = TRUE)
+    X_bootstrap <- X[indices, ]
+    y_bootstrap <- y[indices]
+
+    # Run logistic regression on the bootstrap sample
+    beta_bootstraps[, i] <- log_reg(X_bootstrap, y_bootstrap)
+  }
+
+  # Calculate confidence intervals
+  lower <- apply(beta_bootstraps, 1, function(row) quantile(row, alpha / 2))
+  upper <- apply(beta_bootstraps, 1, function(row) quantile(row, 1 - alpha / 2))
+
+  intervals <- data.frame(lower = lower, upper = upper)
+  return(intervals)
+}
+
+
+# Bootstrap confidence intervals
+intervals <- bootstrap_conf_intervals(X, y)
+
+# Print the resulting intervals
+print(intervals)
+```  
   
 ### *Plot of the fitted logistic curve to the responses*
 
@@ -45,6 +73,32 @@ Diagnostic Odds Ratio
 ### *Plot above metrics over a grid*
 
 The possibility for the user to plot of any of the above metrics evaluated over a grid of cut-off values for prediction going from 0.1 to 0.9 with steps of 0.1.
+
+```{r metrics} 
+plot_metrics <- function(X, y, cutoff_values = seq(0.1, 0.9, by = 0.1)) {
+  result <- log_reg(X, y)
+  predicted_probs <- pf(t(X), result)
+  metrics_matrix <- matrix(NA, nrow = length(cutoff_values), ncol = 7,
+                           dimnames = list(NULL, c("Cutoff", "Prevalence", "Accuracy", "Sensitivity", "Specificity", "False Discovery Rate", "Diagnostic Odds Ratio")))
+
+  # Calculate metrics for each cutoff
+  for (i in seq_along(cutoff_values)) {
+    metrics <- confmat(y, predicted_probs, cutoff_values[i])
+    metrics_matrix[i, ] <- c(cutoff_values[i], metrics[[1]], metrics[[2]], metrics[[3]], metrics[[4]], metrics[[5]], metrics[[6]])
+  }
+
+  # Plot metrics
+  par(mfrow = c(3, 2), mar = c(4, 4, 2, 1), oma = c(0, 0, 2, 0))
+  metrics_names <- c("Prevalence", "Accuracy", "Sensitivity", "Specificity", "False Discovery Rate", "Diagnostic Odds Ratio")
+  for (i in seq_along(metrics_names)) {
+    plot(metrics_matrix[, "Cutoff"], metrics_matrix[, i + 1], type = "l", col = i + 1,
+         xlab = "Cutoff", ylab = metrics_names[i], main = paste("Metric vs. Cutoff"))
+
+  }
+}
+
+plot_metrics(X, y)
+```
 
 ### *Include Help documentation for all functions*
 
