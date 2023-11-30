@@ -24,15 +24,29 @@ beta_ls <- function(beta, x, y){
 log_reg <- function(X, y){
   B_initial <- solve(t(X)%*%X)%*%t(X)%*%y
   result <- optim(par = B_initial, fn = beta_ls, x = X, y = y)
-  out <- list("int" = result$par[1,], "b1" = result$par[2,], "b2" = result$par[3,], "b3" = result$par[4,])
+  y_pred <- X%*%B_initial
+  out <- list("y_pred" = y_pred, "y_actual" = y, "X" = X, "B_initial" = B_initial)
   class(out) <- "my_b"
   return(result$par)
 }
 
 plot.my_b <- function(obj){
-  plot(obj$X ~ obj$y)
+  y_pred <- obj$y_pred
+  plot(obj$y_actual ~ obj$y_pred ,xlim = range(obj$y_pred), ylim = range(-.05, 1.5))
+  x_line <- seq(min(obj$y_pred), max(obj$y_pred), length = 100)
+  y_line <- pf(t(obj$X), obj$B_initial)
+  lines(x_line, sort(y_line), col = "red", lty = 1, lwd = 2)
 }
 
+
+y_pred <- X%*%B_initial
+plot(y ~ y_pred ,xlim = range(y_pred), ylim = range(-.05, 1.5))
+x_line <- seq(min(y_pred), max(y_pred), length = 100)
+y_line <- pf(t(X), B_initial)
+lines(x_line, sort(y_line), col = "red", lty = 1, lwd = 2)
+
+test <- log_reg(X, y)
+plot(test)
 
 ##generate random data 
 set.seed(123)
@@ -54,6 +68,7 @@ test <- beta_ls(B_initial,X,y)
 result <- optim(par = B_initial, fn = beta_ls, x = X, y = y)
 
 log_reg(X,y)
+
 
 
 
@@ -134,6 +149,7 @@ confmat <- function(y_actual, y_pred, cutoff = 0.5){
 }
 
 confmat(y, y_pred)
+
 
 #plot metrics cut off grid 
 
