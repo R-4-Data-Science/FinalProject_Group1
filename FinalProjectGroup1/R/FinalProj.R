@@ -1,25 +1,3 @@
-#' @title Logistic Regression
-#'
-#' @description This function delivers the value of the loss function for a given value of \code{beta}
-#' @param resp A \code{vector} of dimension n.
-#' @param pred A \code{matrix} containing predictors.
-#' @param beta A \code{vector} containing coefficients.
-#' @param norm A \code{character} defining loss to use (default is `L2`).
-#' @return A \code{numeric} giving value of loss at \code{beta}
-#' @author Elena Gagliano
-#' @author Helen Wu
-#' @author Max Van Horn
-#' @importFrom stats #put package and then fxn from package you rely on
-#' @export
-#' @examples
-#' set.seed(123)
-#' X <- matrix(rnorm(600), nrow = 200) # true matrix of predictors
-#' epsilon <- rnorm(200, 0, sd = 0.25) # observation error
-#'X <- cbind(rep(1, 200), X) # add a column of ones to generate the response with an intercept value
-#'beta <- c(-1, 4, -5, 2) # true coefficient values we want to estimate (first element is the intercept)
-#'y <- X%*%beta + epsilon # generate response y based on this model
-#'beta_ls <- function(resp, pred, beta, norm = "L2")
-
 set.seed(123)
 x1 <- rnorm(100)
 x2 <- rnorm(100)
@@ -39,19 +17,6 @@ pf <- function(x, beta){
   out <- 1/(1 + exp(-t(x)%*%beta))
   return(out)
 }
-
-#'@description This function delivers the value of the loss function for a given value of \code{beta}
-#' @param resp A \code{vector} of dimension n.
-#' @param pred A \code{matrix} containing predictors.
-#' @param beta A \code{vector} containing coefficients.
-#' @param norm A \code{character} defining loss to use (default is `L2`).
-#' @return A \code{numeric} giving value of loss at \code{beta}
-#' @author Elena Gagliano
-#' @author Helen Wu
-#' @author Max Van Horn
-#' @importFrom stats #put package and then fxn from package you rely on
-#' @export
-#' @examples
 
 
 #need a matrix with first column as predictors, and second column as response as input
@@ -83,7 +48,6 @@ beta_ls <- function(beta, x, y){
 #' @importFrom stats #put package and then fxn from package you rely on
 #' @export
 #' @examples
-#'
 log_reg <- function(X, y){
   B_initial <- solve(t(X)%*%X)%*%t(X)%*%y
   result <- optim(par = B_initial, fn = beta_ls, x = X, y = y)
@@ -93,7 +57,9 @@ log_reg <- function(X, y){
   return(result$par)
 }
 
-#@description This function delivers the value of the loss function for a given value of \code{beta}
+#' @title Logistic Regression
+#'
+#' @description This function delivers the value of the loss function for a given value of \code{beta}
 #' @param resp A \code{vector} of dimension n.
 #' @param pred A \code{matrix} containing predictors.
 #' @param beta A \code{vector} containing coefficients.
@@ -105,7 +71,6 @@ log_reg <- function(X, y){
 #' @importFrom stats #put package and then fxn from package you rely on
 #' @export
 #' @examples
-
 plot.my_b <- function(obj){
   y_pred <- obj$y_pred
   plot(obj$y_actual ~ obj$y_pred ,xlim = range(obj$y_pred), ylim = range(-.05, 1.5))
@@ -137,7 +102,20 @@ log_reg(X,y)
 
 ## OUTLINE for bootstrap confidence intervals -- will need to be updated once logistic regression is complete
 
-
+#' @title Logistic Regression
+#'
+#' @description This function delivers the value of the loss function for a given value of \code{beta}
+#' @param resp A \code{vector} of dimension n.
+#' @param pred A \code{matrix} containing predictors.
+#' @param beta A \code{vector} containing coefficients.
+#' @param norm A \code{character} defining loss to use (default is `L2`).
+#' @return A \code{numeric} giving value of loss at \code{beta}
+#' @author Elena Gagliano
+#' @author Helen Wu
+#' @author Max Van Horn
+#' @importFrom stats #put package and then fxn from package you rely on
+#' @export
+#' @examples
 bootstrap_conf_intervals <- function(X, y, alpha = 0.05, n_bootstraps = 20) {
   n <- nrow(X)
   beta_bootstraps <- matrix(NA, ncol = n_bootstraps, nrow = length(log_reg(X, y)))
@@ -160,19 +138,6 @@ bootstrap_conf_intervals <- function(X, y, alpha = 0.05, n_bootstraps = 20) {
   return(intervals)
 }
 
-# test bootstrap
-set.seed(123)
-x1 <- rnorm(100)
-x2 <- rnorm(100)
-x3 <- rnorm(100)
-X <- cbind(1, x1, x2, x3)
-beta0 <- -1
-beta1 <- 2
-beta2 <- -0.5
-beta3 <- 1.5
-true_beta <- matrix(c(beta0, beta1, beta2, beta3), ncol = 1)
-p <- 1 / (1 + exp(-(X %*% true_beta)))
-y <- rbinom(100, 1, p)
 
 # Bootstrap confidence intervals
 intervals <- bootstrap_conf_intervals(X, y)
@@ -193,6 +158,20 @@ lines(x_line, sort(y_line), col = "red", lty = 1, lwd = 2)
 
 
 ##confusion matrix function
+#' @title Logistic Regression
+#'
+#' @description This function delivers the value of the loss function for a given value of \code{beta}
+#' @param resp A \code{vector} of dimension n.
+#' @param pred A \code{matrix} containing predictors.
+#' @param beta A \code{vector} containing coefficients.
+#' @param norm A \code{character} defining loss to use (default is `L2`).
+#' @return A \code{numeric} giving value of loss at \code{beta}
+#' @author Elena Gagliano
+#' @author Helen Wu
+#' @author Max Van Horn
+#' @importFrom stats #put package and then fxn from package you rely on
+#' @export
+#' @examples
 library(caret)
 confmat <- function(y_actual, y_pred, cutoff = 0.5){
   #convert predicted values to 0 or 1 based on threshold
@@ -220,6 +199,20 @@ confmat(y, y_pred)
 
 
 # Function to plot metrics over a grid of cutoff values
+#' @title Logistic Regression
+#'
+#' @description This function delivers the value of the loss function for a given value of \code{beta}
+#' @param resp A \code{vector} of dimension n.
+#' @param pred A \code{matrix} containing predictors.
+#' @param beta A \code{vector} containing coefficients.
+#' @param norm A \code{character} defining loss to use (default is `L2`).
+#' @return A \code{numeric} giving value of loss at \code{beta}
+#' @author Elena Gagliano
+#' @author Helen Wu
+#' @author Max Van Horn
+#' @importFrom stats #put package and then fxn from package you rely on
+#' @export
+#' @examples
 plot_metrics <- function(X, y, cutoff_values = seq(0.1, 0.9, by = 0.1)) {
   result <- log_reg(X, y)
   predicted_probs <- pf(t(X), result)
