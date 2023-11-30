@@ -36,7 +36,7 @@ beta_ls <- function(beta, x, y){
 }
 
 
-#@description This function delivers the value of the loss function for a given value of \code{beta}
+# @description Function models the relationship between the independent variables and the probability of a particular outcome. The function then list the predicted, actual, and initial values.
 #' @param resp A \code{vector} of dimension n.
 #' @param pred A \code{matrix} containing predictors.
 #' @param beta A \code{vector} containing coefficients.
@@ -57,9 +57,9 @@ log_reg <- function(X, y){
   return(result$par)
 }
 
-#' @title Logistic Regression
+#' @title Logistic Regression Plots
 #'
-#' @description This function delivers the value of the loss function for a given value of \code{beta}
+#' @description This function uses the logcistical regression computations to plot a fitted logistic curve in the data
 #' @param resp A \code{vector} of dimension n.
 #' @param pred A \code{matrix} containing predictors.
 #' @param beta A \code{vector} containing coefficients.
@@ -102,9 +102,9 @@ log_reg(X,y)
 
 ## OUTLINE for bootstrap confidence intervals -- will need to be updated once logistic regression is complete
 
-#' @title Logistic Regression
+#' @title Bootstrap
 #'
-#' @description This function delivers the value of the loss function for a given value of \code{beta}
+#' @description This function resamples the data and lets the user choose the significance level α to obtain for the 1−α confidence intervals for β, and the number of bootstraps which by default is 20.
 #' @param resp A \code{vector} of dimension n.
 #' @param pred A \code{matrix} containing predictors.
 #' @param beta A \code{vector} containing coefficients.
@@ -158,9 +158,9 @@ lines(x_line, sort(y_line), col = "red", lty = 1, lwd = 2)
 
 
 ##confusion matrix function
-#' @title Logistic Regression
+#' @title Confusion Matrix
 #'
-#' @description This function delivers the value of the loss function for a given value of \code{beta}
+#' @description This function creates the confusion matrix that measures the accuracy of the function
 #' @param resp A \code{vector} of dimension n.
 #' @param pred A \code{matrix} containing predictors.
 #' @param beta A \code{vector} containing coefficients.
@@ -199,9 +199,9 @@ confmat(y, y_pred)
 
 
 # Function to plot metrics over a grid of cutoff values
-#' @title Logistic Regression
+#' @title Confusion Matrix Plots
 #'
-#' @description This function delivers the value of the loss function for a given value of \code{beta}
+#' @description This function plots a grid that includes all of the metrics measured by the confusion matrix
 #' @param resp A \code{vector} of dimension n.
 #' @param pred A \code{matrix} containing predictors.
 #' @param beta A \code{vector} containing coefficients.
