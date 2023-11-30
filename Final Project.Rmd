@@ -237,7 +237,7 @@ plot_metrics <- function(X, y, cutoff_values = seq(0.1, 0.9, by = 0.1)) {
 ```
 Here is an example of this function being used with the above calculated metrics from the Abalone data set. The cut-off values for prediction can be anywhere from 0.1 to 0.9 with steps of 0.1. For this example we choose to use 0.2 as our cut-off values.
 ```{r}
-any(!is.finite(X_abalone))
+
 plotmet <- plot_metrics(X_abalone, y_abalone, cutoff_values = 0.2)
 
 

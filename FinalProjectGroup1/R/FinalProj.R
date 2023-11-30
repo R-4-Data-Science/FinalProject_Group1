@@ -59,6 +59,7 @@ beta_ls <- function(beta, x, y){
 #' B_initial <- solve(t(X)%*%X)%*%t(X)%*%y
 
 log_reg <- function(X, y){
+  colnames(X)[1] <- "Intercept"
   B_initial <- solve(t(X)%*%X)%*%t(X)%*%y
   result <- optim(par = B_initial, fn = beta_ls, x = X, y = y)
   parameters <- result$par
@@ -176,7 +177,7 @@ y_pred <- log_reg(X,y)$y_pred
 confmat <- function(y_actual, y_pred, cutoff = 0.5){
   #convert predicted values to 0 or 1 based on threshold
   y_bin <- ifelse(y_pred >= cutoff, 1,0)
-  cmat <- confusionMatrix(factor(y), factor(y_bin))
+  cmat <- confusionMatrix(factor(y_actual), factor(y_bin))
   metrics <- cmat$byClass
   prevalence <- as.numeric(metrics["Prevalence"])
   accuracy <- as.numeric(cmat$overall["Accuracy"])
@@ -215,7 +216,7 @@ confmat(y, y_pred)
 #' @examples
 plot_metrics <- function(X, y, cutoff_values = seq(0.1, 0.9, by = 0.1)) {
   result <- log_reg(X, y)$betas
-  predicted_probs <- pf(t(X), result)
+  predicted_probs <- pf(t(X), result$betas)
   metrics_matrix <- matrix(NA, nrow = length(cutoff_values), ncol = 7,
                            dimnames = list(NULL, c("Cutoff", "Prevalence", "Accuracy", "Sensitivity", "Specificity", "False Discovery Rate", "Diagnostic Odds Ratio")))
 
