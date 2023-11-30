@@ -9,14 +9,76 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r, echo=FALSE}
-data <- read.csv("covid.csv")
+data <- as.data.frame(read.csv("covid.csv"))
+data$Outcome <- as.factor(data$Outcome)
+data$Outcome <- ifelse(data$Outcome == "Healed", 1, 0)
 summary(data)
 ```
 
-## Logistic Regression using optimization Vignette
+## *Beta Loss function to prepare for logistic regression function*
+```{r loss}
+pf <- function(x, beta){
+  out <- 1/(1 + exp(-t(x)%*%beta))
+  return(out)
+}
 
 
-###*Initial values for optimization obtained from the least-squares formula (XTX)−1XTy*
+beta_ls <- function(beta, x, y){
+  sum <- 0
+  for(i in 1:nrow(x)){
+    xi <- as.matrix(unlist(x[i,]), ncol = 1) #format it so dimensions work out later
+    yi <- y[i]
+    pi <- pf(xi,as.matrix(beta))
+
+
+    res <- (-1*yi)*(log(pi)) - (1 - yi)*log(1-pi)
+    sum <- sum + res
+  }
+  return(sum)
+
+}
+```
+
+## *Logistic Regression with Optimization Function*
+The initial values for optimization were obtained from the least-squares formula (XTX)−1XTy.
+
+```{r logreg}
+log_reg <- function(X, y){
+  B_initial <- solve(t(X)%*%X)%*%t(X)%*%y
+  result <- optim(par = B_initial, fn = beta_ls, x = X, y = y)
+  parameters <- result$par
+  y_pred <- X%*%parameters
+  out <- list("betas" = parameters, "y_pred" = y_pred, "y_actual" = y, "X" = X, "Parameters" = parameters)
+  class(out) <- "my_b"
+
+  return(out)
+
+}
+
+```
+
+Example using covid dataset 
+
+
+
+### *Plot of the fitted logistic curve to the responses*
+
+The y -axis is the binary response y while the x-axis represents a sequence of values from the range of Xβ̂. 
+
+```{r logplot}
+plot.my_b <- function(obj){
+  y_pred <- obj$y_pred
+  y_actual <- obj$y_actual
+  X <- obj$X
+  parameters <- obj$parameters
+
+  plot(y_actual ~ y_pred ,xlim = range(y_pred), ylim = range(-.05, 1.5))
+
+  x_line <- seq(min(y_pred), max(y_pred), length = length(y_pred))
+  y_line <- pf(t(X), obj$betas)
+  lines(x_line, sort(y_line), col = "red", lty = 1, lwd = 2)
+}
+```
 
 
 
@@ -28,7 +90,7 @@ summary(data)
 ```{r bootstrap}
 bootstrap_conf_intervals <- function(X, y, alpha = 0.05, n_bootstraps = 20) {
   n <- nrow(X)
-  beta_bootstraps <- matrix(NA, ncol = n_bootstraps, nrow = length(log_reg(X, y)))
+  beta_bootstraps <- matrix(NA, ncol = n_bootstraps, nrow = length(log_reg(X, y)$betas))
 
   for (i in 1:n_bootstraps) {
     # Sample with replacement
@@ -37,7 +99,7 @@ bootstrap_conf_intervals <- function(X, y, alpha = 0.05, n_bootstraps = 20) {
     y_bootstrap <- y[indices]
 
     # Run logistic regression on the bootstrap sample
-    beta_bootstraps[, i] <- log_reg(X_bootstrap, y_bootstrap)
+    beta_bootstraps[, i] <- log_reg(X_bootstrap, y_bootstrap)$betas
   }
 
   # Calculate confidence intervals
@@ -72,15 +134,6 @@ intervals <- bootstrap_conf_intervals(X, y)
 print(intervals)
 ```
 
-  
-### *Plot of the fitted logistic curve to the responses*
-
-The y -axis is the binary response y while the x-axis represents a sequence of values from the range of Xβ̂. 
- (see this link or this link for inspiration).
- 
- 
- 
- 
 ### *Generate resulting "Confusion Matrix”*
 
 This uses a cut-off value for prediction at 0.5 (i.e. assign value 1 for predictions above 0.5 and value 0 for prediction below or equal to 0.5). Based on this cut-off value, it also outputs the following metrics:
