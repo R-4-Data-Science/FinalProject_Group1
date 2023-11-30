@@ -51,15 +51,19 @@ beta_ls <- function(beta, x, y){
 log_reg <- function(X, y){
   B_initial <- solve(t(X)%*%X)%*%t(X)%*%y
   result <- optim(par = B_initial, fn = beta_ls, x = X, y = y)
-  y_pred <- X%*%B_initial
-  out <- list("y_pred" = y_pred, "y_actual" = y, "X" = X, "B_initial" = B_initial)
+  parameters <- result$par
+  y_pred <- X%*%parameters
+  out <- list("betas" = parameters, "y_pred" = y_pred, "y_actual" = y, "X" = X, "Parameters" = parameters)
   class(out) <- "my_b"
-  return(result$par)
+
+  return(out)
+
 }
+
 
 #' @title Logistic Regression Plots
 #'
-#' @description This function uses the logcistical regression computations to plot a fitted logistic curve in the data
+#' @description This function uses logistic regression computations to plot a fitted logistic curve in the data
 #' @param resp A \code{vector} of dimension n.
 #' @param pred A \code{matrix} containing predictors.
 #' @param beta A \code{vector} containing coefficients.
@@ -73,31 +77,19 @@ log_reg <- function(X, y){
 #' @examples
 plot.my_b <- function(obj){
   y_pred <- obj$y_pred
-  plot(obj$y_actual ~ obj$y_pred ,xlim = range(obj$y_pred), ylim = range(-.05, 1.5))
-  x_line <- seq(min(obj$y_pred), max(obj$y_pred), length = 100)
-  y_line <- pf(t(obj$X), obj$B_initial)
+  y_actual <- obj$y_actual
+  X <- obj$X
+  parameters <- obj$parameters
+
+  plot(y_actual ~ y_pred ,xlim = range(y_pred), ylim = range(-.05, 1.5))
+
+  x_line <- seq(min(y_pred), max(y_pred), length = length(y_pred))
+  y_line <- pf(t(X), obj$betas)
   lines(x_line, sort(y_line), col = "red", lty = 1, lwd = 2)
 }
 
-
-y_pred <- X%*%B_initial
-plot(y ~ y_pred ,xlim = range(y_pred), ylim = range(-.05, 1.5))
-x_line <- seq(min(y_pred), max(y_pred), length = 100)
-y_line <- pf(t(X), B_initial)
-lines(x_line, sort(y_line), col = "red", lty = 1, lwd = 2)
-
 test <- log_reg(X, y)
 plot(test)
-
-##generate random data
-
-
-test <- beta_ls(B_initial,X,y)
-result <- optim(par = B_initial, fn = beta_ls, x = X, y = y)
-
-log_reg(X,y)
-
-
 
 
 ## OUTLINE for bootstrap confidence intervals -- will need to be updated once logistic regression is complete
@@ -118,7 +110,7 @@ log_reg(X,y)
 #' @examples
 bootstrap_conf_intervals <- function(X, y, alpha = 0.05, n_bootstraps = 20) {
   n <- nrow(X)
-  beta_bootstraps <- matrix(NA, ncol = n_bootstraps, nrow = length(log_reg(X, y)))
+  beta_bootstraps <- matrix(NA, ncol = n_bootstraps, nrow = length(log_reg(X, y)$betas))
 
   for (i in 1:n_bootstraps) {
     # Sample with replacement
@@ -127,7 +119,7 @@ bootstrap_conf_intervals <- function(X, y, alpha = 0.05, n_bootstraps = 20) {
     y_bootstrap <- y[indices]
 
     # Run logistic regression on the bootstrap sample
-    beta_bootstraps[, i] <- log_reg(X_bootstrap, y_bootstrap)
+    beta_bootstraps[, i] <- log_reg(X_bootstrap, y_bootstrap)$betas
   }
 
   # Calculate confidence intervals
@@ -146,17 +138,6 @@ intervals <- bootstrap_conf_intervals(X, y)
 print(intervals)
 
 
-##logistic regression plot
-##plot dots from before transformation of XB (or y tilda)
-##plot line from after the transformation
-y_pred <- X%*%B_initial
-plot(y ~ y_pred ,xlim = range(y_pred), ylim = range(-.05, 1.5))
-x_line <- seq(min(y_pred), max(y_pred), length = 100)
-y_line <- pf(t(X), B_initial)
-lines(x_line, sort(y_line), col = "red", lty = 1, lwd = 2)
-
-
-
 ##confusion matrix function
 #' @title Confusion Matrix
 #'
@@ -173,6 +154,7 @@ lines(x_line, sort(y_line), col = "red", lty = 1, lwd = 2)
 #' @export
 #' @examples
 library(caret)
+y_pred <- log_reg(X,y)$y_pred
 confmat <- function(y_actual, y_pred, cutoff = 0.5){
   #convert predicted values to 0 or 1 based on threshold
   y_bin <- ifelse(y_pred >= cutoff, 1,0)
@@ -214,7 +196,7 @@ confmat(y, y_pred)
 #' @export
 #' @examples
 plot_metrics <- function(X, y, cutoff_values = seq(0.1, 0.9, by = 0.1)) {
-  result <- log_reg(X, y)
+  result <- log_reg(X, y)$betas
   predicted_probs <- pf(t(X), result)
   metrics_matrix <- matrix(NA, nrow = length(cutoff_values), ncol = 7,
                            dimnames = list(NULL, c("Cutoff", "Prevalence", "Accuracy", "Sensitivity", "Specificity", "False Discovery Rate", "Diagnostic Odds Ratio")))
