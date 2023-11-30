@@ -8,12 +8,6 @@ date: "2023-11-30"
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r, echo=FALSE}
-data <- as.data.frame(read.csv("covid.csv"))
-data$Outcome <- as.factor(data$Outcome)
-data$Outcome <- ifelse(data$Outcome == "Healed", 1, 0)
-summary(data)
-```
 
 
 ```{r, echo = FALSE}
@@ -21,10 +15,9 @@ summary(data)
 data <- as.data.frame(read.csv("abalone.data"), header = FALSE)
 colnames(data) <- c("Sex", "Length", "Diameter", "Height", "Whole_weight", "Shucked_weight", "Viscera_weight", "Shell_weight", "Rings")
 head(data)
-
 #remove infant columns so we have binary response variable
 data <- data[data$Sex != "I", ]
-
+data <- data[1:100, ]
 #convert Male to 1 and Female to 0 
 data$Sex <- ifelse(data$Sex == "M", 1,0)
 
@@ -33,6 +26,7 @@ x_columns <- c("Length", "Diameter", "Height", "Whole_weight", "Shucked_weight",
 X_abalone <- as.matrix(data[x_columns])
 ##add a column of ones for the intercept
 X_abalone <- cbind(1, X_abalone)
+X_abalone <- X_abalone[1:length(y_abalone), ]
 
 
 
@@ -87,11 +81,13 @@ The response variable is the sex, male denoted as 1 and female denoted with 0. T
 results <- log_reg(X_abalone, y_abalone)
 results$betas
 
+B_ab <- solve(t(X_abalone)%*%X_abalone)%*%t(X_abalone)%*%y_abalone
+test <- optim(par = B_ab, fn = beta_ls, x = X_abalone, y = y_abalone)
+
+test_pred <- X_abalone%*%test$par
+
+
 ```
-
-
-
-
 
 
 
@@ -115,8 +111,11 @@ plot.my_b <- function(obj){
 }
 ```
 
+Here we use the plot() function in this package
+```{r logplot}
+plot(results)
 
-
+```
 
 .
 ### *Bootstrap Confidence intervals*
@@ -153,17 +152,12 @@ intervals <- bootstrap_conf_intervals(X, y)
 print(intervals)
 ```  
 
-For example, using the covid dataset with symptoms as a predictor: 
+For example, using the Abalone dataset with different measurements as predictors: 
 
 ```{r bootstrap example}
-set.seed(123)  
-
-# Extract predictors and response variable
-X <- cbind(1, data[, colnames(data) != "y"])  # Replace "x1", "x2", "x3" with actual column names
-y <- data$y
 
 # Bootstrap confidence intervals
-intervals <- bootstrap_conf_intervals(X, y)
+intervals <- bootstrap_conf_intervals(X_abalone, y_abalone)
 
 # Print the resulting intervals
 print(intervals)
@@ -179,6 +173,39 @@ Specificity
 False Discovery Rate
 Diagnostic Odds Ratio
 
+```{r confmat}
+library(caret)
+confmat <- function(y_actual, y_pred, cutoff = 0.5){
+  #convert predicted values to 0 or 1 based on threshold
+  y_actual <- factor(y_actual)
+  y_bin <- factor(ifelse(y_pred >= cutoff, 1,0), levels = levels(y_actual))
+  cmat <- confusionMatrix(y_actual, y_bin)
+  metrics <- cmat$byClass
+  prevalence <- as.numeric(metrics["Prevalence"])
+  accuracy <- as.numeric(cmat$overall["Accuracy"])
+  sensitivity <- as.numeric(metrics["Sensitivity"])
+  specificity <- as.numeric(metrics["Specificity"])
+  true_p <- cmat$byClass["Pos Pred Value"] * cmat$byClass["Precision"]
+  false_p <- cmat$byClass["Neg Pred Value"] * cmat$byClass["Precision"]
+  false_discovery_rate <- as.numeric(false_p / (false_p + true_p))
+  diagnostic_odds_ratio <- as.numeric(metrics["Sensitivity"]/(1 - metrics["Specificity"]))
+  
+  out <- invisible(list("Prevalence" = prevalence, "Accuracy" = accuracy, "Sensitivity" = sensitivity, "Specificity" = specificity, "False Discovery Rate" = false_discovery_rate, "Diagnostic Odds Ratio" = diagnostic_odds_ratio))
+  return(out)
+
+}
+
+```
+
+Here is an example of the output when running the confusion matrix function on the Abalone data set with a cutoff of 0.5. We can use the outputs from the log_reg function to use as the parameters for this function. 
+``` {r }
+y_p <- results$y_pred
+y_a <- results$y_actual
+
+test <- confmat(y_a, y_p)
+test
+
+```
 
 ### *Plot above metrics over a grid*
 
@@ -187,7 +214,7 @@ The possibility for the user to plot of any of the above metrics evaluated over 
 ```{r metrics} 
 plot_metrics <- function(X, y, cutoff_values = seq(0.1, 0.9, by = 0.1)) {
   result <- log_reg(X, y)
-  predicted_probs <- pf(t(X), result)
+  predicted_probs <- pf(t(X), result$betas)
   metrics_matrix <- matrix(NA, nrow = length(cutoff_values), ncol = 7,
                            dimnames = list(NULL, c("Cutoff", "Prevalence", "Accuracy", "Sensitivity", "Specificity", "False Discovery Rate", "Diagnostic Odds Ratio")))
 
@@ -207,7 +234,13 @@ plot_metrics <- function(X, y, cutoff_values = seq(0.1, 0.9, by = 0.1)) {
   }
 }
 
-plot_metrics(X, y)
+```
+Here is an example of this function being used with the above calculated metrics from the Abalone data set. The cut-off values for prediction can be anywhere from 0.1 to 0.9 with steps of 0.1. For this example we choose to use 0.2 as our cut-off values.
+```{r}
+any(!is.finite(X_abalone))
+plotmet <- plot_metrics(X_abalone, y_abalone, cutoff_values = 0.2)
+
+
 ```
 
 ### *Include Help documentation for all functions*
