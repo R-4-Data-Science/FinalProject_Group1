@@ -57,7 +57,7 @@ beta_ls <- function(beta, x, y){
 ```
 
 ## *Logistic Regression with Optimization Function*
-The initial values for optimization were obtained from the least-squares formula (XTX)−1XTy.
+The initial values for optimization were obtained from the least-squares formula (XTX)−1XTy. The parameters for this function should be a matrix of predictors with the first column being 1s to account for the intercept, and a vector for the response variable. The output produces a list consisting of the estimated coefficients (named "betas"), the predicted y-values using the estimated coefficientes (named "y_pred"), the initial y-values (named "y_actual"), and the initial X matrix (named "X").
 
 ```{r logreg}
 log_reg <- function(X, y){
@@ -66,7 +66,7 @@ log_reg <- function(X, y){
   result <- optim(par = B_initial, fn = beta_ls, x = X, y = y)
   parameters <- result$par
   y_pred <- X%*%parameters
-  out <- list("betas" = parameters, "y_pred" = y_pred, "y_actual" = y, "X" = X, "Parameters" = parameters)
+  out <- list("betas" = parameters, "y_pred" = y_pred, "y_actual" = y, "X" = X)
   class(out) <- "my_b"
 
   return(out)
