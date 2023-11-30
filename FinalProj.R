@@ -131,10 +131,10 @@ confmat <- function(y_actual, y_pred, cutoff = 0.5){
   false_p <- cmat$byClass["Neg Pred Value"] * cmat$byClass["Precision"]
   false_discovery_rate <- as.numeric(false_p / (false_p + true_p))
   formatted_fdr <- sprintf("False Discovery Rate %.4f", false_discovery_rate)
-  diagnostic_odds_ratio <- metrics["Sensitivity"]/(1 - metrics["Specificity"])
+  diagnostic_odds_ratio <- as.numeric(metrics["Sensitivity"]/(1 - metrics["Specificity"]))
   formatted_dor <- sprintf("Diagnostic Odds Ratio %.4f", diagnostic_odds_ratio)
   
-  out <- invisible(list(formatted_prev, formatted_acc, formatted_sens, formatted_spec, formatted_fdr, formatted_dor))
+  out <- invisible(list("Prevalence" = prevalence, "Accuracy" = accuracy, "Sensitivity" = sensitivity, "Specificity" = specificity, "False Discovery Rate" = false_discovery_rate, "Diagnostic Odds Ratio" = diagnostic_odds_ratio))
   return(out)
 
 }
