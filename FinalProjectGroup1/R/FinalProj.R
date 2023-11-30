@@ -37,23 +37,33 @@ beta_ls <- function(beta, x, y){
 
 
 # @description Function models the relationship between the independent variables and the probability of a particular outcome. The function then list the predicted, actual, and initial values.
-#' @param resp A \code{vector} of dimension n.
-#' @param pred A \code{matrix} containing predictors.
-#' @param beta A \code{vector} containing coefficients.
-#' @param norm A \code{character} defining loss to use (default is `L2`).
-#' @return A \code{numeric} giving value of loss at \code{beta}
+#' @param resp y \code{vector} of length n.
+#' @param pred X \code{matrix} n number rows beta plus 1 number of columns with first column being entirely ones.
+#' @return A \list{numeric} giving beta coefficients estimates, a vector of predicted y-values using predicted estimates, and original y-values and x-matrix.
 #' @author Elena Gagliano
 #' @author Helen Wu
 #' @author Max Van Horn
-#' @importFrom stats #put package and then fxn from package you rely on
-#' @export
 #' @examples
+#' set.seed(123)
+#' x1 <- rnorm(100)
+#' x2 <- rnorm(100)
+#' x3 <- rnorm(100)
+#' X <- cbind(1,x1, x2, x3) #1 for the intercept term
+#' beta0 <- -1
+#' beta1 <- 2
+#' beta2 <- -0.5
+#' beta3 <- 1.5
+#' true_beta <- matrix(c(beta0, beta1, beta2, beta3), ncol = 1)
+#' p <- 1/(1 + exp(-(X%*%true_beta)))
+#' y <- rbinom(100,1,p)
+#' B_initial <- solve(t(X)%*%X)%*%t(X)%*%y
+
 log_reg <- function(X, y){
   B_initial <- solve(t(X)%*%X)%*%t(X)%*%y
   result <- optim(par = B_initial, fn = beta_ls, x = X, y = y)
   parameters <- result$par
   y_pred <- X%*%parameters
-  out <- list("betas" = parameters, "y_pred" = y_pred, "y_actual" = y, "X" = X, "Parameters" = parameters)
+  out <- list("betas" = parameters, "y_pred" = y_pred, "y_actual" = y, "X" = X)
   class(out) <- "my_b"
 
   return(out)
@@ -64,17 +74,25 @@ log_reg <- function(X, y){
 #' @title Logistic Regression Plots
 #'
 #' @description This function uses logistic regression computations to plot a fitted logistic curve in the data
-#' @param resp A \code{vector} of dimension n.
-#' @param pred A \code{matrix} containing predictors.
-#' @param beta A \code{vector} containing coefficients.
-#' @param norm A \code{character} defining loss to use (default is `L2`).
-#' @return A \code{numeric} giving value of loss at \code{beta}
+#' @param output log_reg function
+#' @return A graph{numeric} plotting predicted y-values against actual y-values and a logistic regression curve fitted using transformed x values and beta coefficient estimates
 #' @author Elena Gagliano
 #' @author Helen Wu
 #' @author Max Van Horn
-#' @importFrom stats #put package and then fxn from package you rely on
-#' @export
 #' @examples
+#' set.seed(123)
+#' x1 <- rnorm(100)
+#' x2 <- rnorm(100)
+#' x3 <- rnorm(100)
+#' X <- cbind(1,x1, x2, x3) #1 for the intercept term
+#' beta0 <- -1
+#' beta1 <- 2
+#' beta2 <- -0.5
+#' beta3 <- 1.5
+#' true_beta <- matrix(c(beta0, beta1, beta2, beta3), ncol = 1)
+#' p <- 1/(1 + exp(-(X%*%true_beta)))
+#' y <- rbinom(100,1,p)
+#' B_initial <- solve(t(X)%*%X)%*%t(X)%*%y
 plot.my_b <- function(obj){
   y_pred <- obj$y_pred
   y_actual <- obj$y_actual
