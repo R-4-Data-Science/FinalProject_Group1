@@ -134,7 +134,35 @@ confmat <- function(y_actual, y_pred, cutoff = 0.5){
 }
 
 confmat(y, y_pred)
-metrics <- cmat$byClass
-metrics["Prevalence"]
+
+#plot metrics cut off grid 
+
+#cutoff_values <- seq(0.1, 0.9, by = 0.1)
+
+# Function to plot metrics over a grid of cutoff values
+plot_metrics <- function(X, y, cutoff_values = seq(0.1, 0.9, by = 0.1)) {
+  result <- log_reg(X, y)
+  predicted_probs <- pf(t(X), result)
+  metrics_matrix <- matrix(NA, nrow = length(cutoff_values), ncol = 7,
+                           dimnames = list(NULL, c("Cutoff", "Prevalence", "Accuracy", "Sensitivity", "Specificity", "False Discovery Rate", "Diagnostic Odds Ratio")))
+  
+  # Calculate metrics for each cutoff
+  for (i in seq_along(cutoff_values)) {
+    metrics <- confmat(y, predicted_probs, cutoff_values[i])
+    metrics_matrix[i, ] <- c(cutoff_values[i], metrics[[1]], metrics[[2]], metrics[[3]], metrics[[4]], metrics[[5]], metrics[[6]])
+  }
+  
+  # Plot metrics
+  par(mfrow = c(3, 2), mar = c(4, 4, 2, 1), oma = c(0, 0, 2, 0))
+  metrics_names <- c("Prevalence", "Accuracy", "Sensitivity", "Specificity", "False Discovery Rate", "Diagnostic Odds Ratio")
+  for (i in seq_along(metrics_names)) {
+    plot(metrics_matrix[, "Cutoff"], metrics_matrix[, i + 1], type = "l", col = i + 1,
+         xlab = "Cutoff", ylab = metrics_names[i], main = paste("Metric vs. Cutoff"))
+    abline(h = max(metrics_matrix[, i + 1]), col = "red", lty = 2)
+  }
+}
+
+plot_metrics(X, y)
+
 
 
