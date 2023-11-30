@@ -115,17 +115,28 @@ plot(test)
 #' @title Bootstrap
 #'
 #' @description This function resamples the data and lets the user choose the significance level α to obtain for the 1−α confidence intervals for β, and the number of bootstraps which by default is 20.
-#' @param resp A \code{vector} of dimension n.
-#' @param pred A \code{matrix} containing predictors.
-#' @param beta A \code{vector} containing coefficients.
-#' @param norm A \code{character} defining loss to use (default is `L2`).
-#' @return A \code{numeric} giving value of loss at \code{beta}
+#' @param resp y \code{vector} of length n.
+#' @param pred X \code{matrix} n number rows beta plus 1 number of columns with first column being entirely ones.
+#' @param alpha \code{matrix} statistical significance value
+#' @param n_bootstraps code{character} defines the number of times the bootstrap will resample the data
+#' @return A \code{vector} that contains the confidence intervals of the bootstrap
 #' @author Elena Gagliano
 #' @author Helen Wu
 #' @author Max Van Horn
-#' @importFrom stats #put package and then fxn from package you rely on
-#' @export
 #' @examples
+#' set.seed(123)
+#' x1 <- rnorm(100)
+#' x2 <- rnorm(100)
+#' x3 <- rnorm(100)
+#' X <- cbind(1,x1, x2, x3) #1 for the intercept term
+#' beta0 <- -1
+#' beta1 <- 2
+#' beta2 <- -0.5
+#' beta3 <- 1.5
+#' true_beta <- matrix(c(beta0, beta1, beta2, beta3), ncol = 1)
+#' p <- 1/(1 + exp(-(X%*%true_beta)))
+#' y <- rbinom(100,1,p)
+#' B_initial <- solve(t(X)%*%X)%*%t(X)%*%y
 bootstrap_conf_intervals <- function(X, y, alpha = 0.05, n_bootstraps = 20) {
   n <- nrow(X)
   beta_bootstraps <- matrix(NA, ncol = n_bootstraps, nrow = length(log_reg(X, y)$betas))
