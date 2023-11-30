@@ -120,19 +120,13 @@ confmat <- function(y_actual, y_pred, cutoff = 0.5){
   cmat <- confusionMatrix(factor(y), factor(y_bin))
   metrics <- cmat$byClass
   prevalence <- as.numeric(metrics["Prevalence"])
-  formatted_prev <- sprintf("Prevalence %.4f", prevalence)
   accuracy <- as.numeric(cmat$overall["Accuracy"])
-  formatted_acc <- sprintf("Accuracy %.4f", accuracy)
   sensitivity <- as.numeric(metrics["Sensitivity"])
-  formatted_sens <- sprintf("Sensitivity %.4f", sensitivity)
   specificity <- as.numeric(metrics["Specificity"])
-  formatted_spec <- sprintf("Specificity %.4f", specificity)
   true_p <- cmat$byClass["Pos Pred Value"] * cmat$byClass["Precision"]
   false_p <- cmat$byClass["Neg Pred Value"] * cmat$byClass["Precision"]
   false_discovery_rate <- as.numeric(false_p / (false_p + true_p))
-  formatted_fdr <- sprintf("False Discovery Rate %.4f", false_discovery_rate)
   diagnostic_odds_ratio <- as.numeric(metrics["Sensitivity"]/(1 - metrics["Specificity"]))
-  formatted_dor <- sprintf("Diagnostic Odds Ratio %.4f", diagnostic_odds_ratio)
   
   out <- invisible(list("Prevalence" = prevalence, "Accuracy" = accuracy, "Sensitivity" = sensitivity, "Specificity" = specificity, "False Discovery Rate" = false_discovery_rate, "Diagnostic Odds Ratio" = diagnostic_odds_ratio))
   return(out)
