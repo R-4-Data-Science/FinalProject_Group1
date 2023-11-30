@@ -24,29 +24,14 @@ beta_ls <- function(beta, x, y){
 log_reg <- function(X, y){
   B_initial <- solve(t(X)%*%X)%*%t(X)%*%y
   result <- optim(par = B_initial, fn = beta_ls, x = X, y = y)
-  y_pred <- X%*%B_initial
-  out <- list("y_pred" = y_pred, "y_actual" = y, "X" = X, "B_initial" = B_initial)
+  parameters <- result$par
+  y_pred <- X%*%parameters
+  out <- list("betas" = parameters, "y_pred" = y_pred, "y_actual" = y, "X" = X, "Parameters" = parameters)
   class(out) <- "my_b"
-  return(result$par)
-}
-
-plot.my_b <- function(obj){
-  y_pred <- obj$y_pred
-  plot(obj$y_actual ~ obj$y_pred ,xlim = range(obj$y_pred), ylim = range(-.05, 1.5))
-  x_line <- seq(min(obj$y_pred), max(obj$y_pred), length = 100)
-  y_line <- pf(t(obj$X), obj$B_initial)
-  lines(x_line, sort(y_line), col = "red", lty = 1, lwd = 2)
+  return(out)
 }
 
 
-y_pred <- X%*%B_initial
-plot(y ~ y_pred ,xlim = range(y_pred), ylim = range(-.05, 1.5))
-x_line <- seq(min(y_pred), max(y_pred), length = 100)
-y_line <- pf(t(X), B_initial)
-lines(x_line, sort(y_line), col = "red", lty = 1, lwd = 2)
-
-test <- log_reg(X, y)
-plot(test)
 
 ##generate random data 
 set.seed(123)
@@ -77,7 +62,7 @@ log_reg(X,y)
 
 bootstrap_conf_intervals <- function(X, y, alpha = 0.05, n_bootstraps = 20) {
   n <- nrow(X)
-  beta_bootstraps <- matrix(NA, ncol = n_bootstraps, nrow = length(log_reg(X, y)))
+  beta_bootstraps <- matrix(NA, ncol = n_bootstraps, nrow = length(log_reg(X, y)$betas))
   
   for (i in 1:n_bootstraps) {
     # Sample with replacement
@@ -86,7 +71,7 @@ bootstrap_conf_intervals <- function(X, y, alpha = 0.05, n_bootstraps = 20) {
     y_bootstrap <- y[indices]
     
     # Run logistic regression on the bootstrap sample
-    beta_bootstraps[, i] <- log_reg(X_bootstrap, y_bootstrap)
+    beta_bootstraps[, i] <- log_reg(X_bootstrap, y_bootstrap)$betas
   }
   
   # Calculate confidence intervals
@@ -121,11 +106,25 @@ print(intervals)
 ##logistic regression plot
 ##plot dots from before transformation of XB (or y tilda)
 ##plot line from after the transformation
-y_pred <- X%*%B_initial
-plot(y ~ y_pred ,xlim = range(y_pred), ylim = range(-.05, 1.5))
-x_line <- seq(min(y_pred), max(y_pred), length = 100)
-y_line <- pf(t(X), B_initial)
-lines(x_line, sort(y_line), col = "red", lty = 1, lwd = 2)
+
+plot.my_b <- function(obj){
+  y_pred <- obj$y_pred
+  y_actual <- obj$y_actual
+  X <- obj$X
+  parameters <- obj$parameters
+
+  plot(y_actual ~ y_pred ,xlim = range(y_pred), ylim = range(-.05, 1.5))
+  
+  x_line <- seq(min(y_pred), max(y_pred), length = length(y_pred))
+  y_line <- pf(t(X), obj$betas)
+  lines(x_line, sort(y_line), col = "red", lty = 1, lwd = 2)
+}
+
+
+
+test <- log_reg(X, y)
+plot(test)
+
 
 ##confusion matrix function
 library(caret)
