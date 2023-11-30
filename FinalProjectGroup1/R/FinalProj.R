@@ -146,6 +146,7 @@ bootstrap_conf_intervals <- function(X, y, alpha = 0.05, n_bootstraps = 20) {
   upper <- apply(beta_bootstraps, 1, function(row) quantile(row, 1 - alpha / 2))
 
   intervals <- data.frame(lower = lower, upper = upper)
+  rownames(intervals) <- rownames(log_reg(X, y)$betas)
   return(intervals)
 }
 
