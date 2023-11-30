@@ -173,10 +173,10 @@ print(intervals)
 #' @importFrom stats #put package and then fxn from package you rely on
 #' @export
 #' @examples
-library(caret)
 y_pred <- log_reg(X,y)$y_pred
 confmat <- function(y_actual, y_pred, cutoff = 0.5){
   #convert predicted values to 0 or 1 based on threshold
+  library(caret)
   y_bin <- ifelse(y_pred >= cutoff, 1,0)
   cmat <- confusionMatrix(factor(y_actual), factor(y_bin))
   metrics <- cmat$byClass
