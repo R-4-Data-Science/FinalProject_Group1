@@ -212,8 +212,6 @@ bootstrap_conf_intervals <- function(X, y, alpha = 0.05, n_bootstraps = 20) {
 #'y_pred <- log_reg(X,y)$y_pred
 #'confmat(y, y_pred)
 confmat <- function(y_actual, y_pred, cutoff = 0.5){
-  #convert predicted values to 0 or 1 based on threshold
-  library(caret)
   y_bin <- ifelse(y_pred >= cutoff, 1,0)
   cmat <- caret::confusionMatrix(factor(y_actual), factor(y_bin))
   metrics <- cmat$byClass
