@@ -3,18 +3,12 @@ Type: Package
 Title: Logistic Regression Using Optimization
 Version: 0.1.0
 Authors@R: c(
-    person("Elena", "Gagliano", role = c("aut","cre")),
-    person("Helen", "Wu", role = c("aut","cre")),
-    person("Max", "Van Horn", role = c("aut","cre"))
+    person("Elena", "Gagliano", role = "aut"),
+    person("Helen", "Wu", role = "aut"),
+    person("Max", "Van Horn", role = c("aut", "cre", "maintainer"), email = "mtv0012@auburn.edu")
     )
-Maintainer: "Max Van Horn" <mtv0012@auburn.edu
-
-Description: This function obtains different outputs from the procedure by first obtaining
-    initial values of optimization from the least-squares formula. It then allows the user
-    to choose the significance level α to obtain for the 1−α confidence intervals for β. 
-    The function will then provide a fitted logistic curve and the metrics of the confusion
-    matrix in a grid that includes Prevalence, Accuracy, Sensitivity, Specificity, The False
-    Discovery Rate, and the Diagnostic Odds Ratio.
+Maintainer: Max Van Horn <mtv0012@auburn.edu>
+Description: This package implements logistic regression using numerical optimization. There are functions to estimate the coefficient vector Beta which includes the various independet predictors as well as the intercept. This package also includes functions to plot the predicted values against the true response variable with a fitted logistic regression curve. This package also includes a function to create bootstrap confidence intervals in which the user is able to specify the level of significance and the number of bootstraps. A function is also included to allow the user to create a Confusion Matrix with a custom cut-off value for prediction, and based on the cut-off value will produce metrics such as Prevalence, Accuracy, Sensitivity, Specificity, False Discovery Rate, and Diagnostic Odds Ratio. The user then has the ability to plot any of the above metrics on a grid. 
 License: GPL-3
 Encoding: UTF-8
 LazyData: true

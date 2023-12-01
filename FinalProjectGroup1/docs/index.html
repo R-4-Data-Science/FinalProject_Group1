@@ -12,7 +12,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="pkgdown.css" rel="stylesheet">
 <script src="pkgdown.js"></script><meta property="og:title" content="Logistic Regression Using Optimization">
-<meta property="og:description" content="This function obtains different outputs from the procedure by first obtaining initial values of optimization from the least-squares formula. It then allows the user to choose the significance level α to obtain for the 1−α confidence intervals for β. The function will then provide a fitted logistic curve and the metrics of the confusion matrix in a grid that includes Prevalence, Accuracy, Sensitivity, Specificity, The False Discovery Rate, and the Diagnostic Odds Ratio.">
+<meta property="og:description" content="This package implements logistic regression using numerical optimization. There are functions to estimate the coefficient vector Beta which includes the various independet predictors as well as the intercept. This package also includes functions to plot the predicted values against the true response variable with a fitted logistic regression curve. This package also includes a function to create bootstrap confidence intervals in which the user is able to specify the level of significance and the number of bootstraps. A function is also included to allow the user to create a Confusion Matrix with a custom cut-off value for prediction, and based on the cut-off value will produce metrics such as Prevalence, Accuracy, Sensitivity, Specificity, False Discovery Rate, and Diagnostic Odds Ratio. The user then has the ability to plot any of the above metrics on a grid.">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
@@ -55,7 +55,7 @@
 
       </header><div class="row">
   <div class="contents col-md-9">
-This function obtains different outputs from the procedure by first obtaining initial values of optimization from the least-squares formula. It then allows the user to choose the significance level α to obtain for the 1−α confidence intervals for β. The function will then provide a fitted logistic curve and the metrics of the confusion matrix in a grid that includes Prevalence, Accuracy, Sensitivity, Specificity, The False Discovery Rate, and the Diagnostic Odds Ratio.
+This package implements logistic regression using numerical optimization. There are functions to estimate the coefficient vector Beta which includes the various independet predictors as well as the intercept. This package also includes functions to plot the predicted values against the true response variable with a fitted logistic regression curve. This package also includes a function to create bootstrap confidence intervals in which the user is able to specify the level of significance and the number of bootstraps. A function is also included to allow the user to create a Confusion Matrix with a custom cut-off value for prediction, and based on the cut-off value will produce metrics such as Prevalence, Accuracy, Sensitivity, Specificity, False Discovery Rate, and Diagnostic Odds Ratio. The user then has the ability to plot any of the above metrics on a grid.
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -77,7 +77,9 @@ This function obtains different outputs from the procedure by first obtaining in
 <div class="developers">
 <h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
-<li>"Max Van Horn" <br><small class="roles"> Maintainer </small>  </li>
+<li>Elena Gagliano <br><small class="roles"> Author </small>  </li>
+<li>Helen Wu <br><small class="roles"> Author </small>  </li>
+<li>Max Van Horn <br><small class="roles"> Author, maintainer </small>  </li>
 </ul>
 </div>
 
@@ -89,7 +91,7 @@ This function obtains different outputs from the procedure by first obtaining in
 
       <footer><div class="copyright">
   <p></p>
-<p>Developed by “Max Van Horn”.</p>
+<p>Developed by Elena Gagliano, Helen Wu, Max Van Horn.</p>
 </div>
 
 <div class="pkgdown">
