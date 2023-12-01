@@ -118,7 +118,7 @@ plot.my_b <- function(obj){
 #' @description This function resamples the data and lets the user choose the significance level α to obtain for the 1−α confidence intervals for β, and the number of bootstraps which by default is 20.
 #' @param resp y \code{vector} of length n.
 #' @param pred X \code{matrix} n number rows beta plus 1 number of columns with first column being entirely ones.
-#' @param alpha \code{matrix} statistical significance value
+#' @param alpha \code{scaler} statistical significance value
 #' @param n_bootstraps code{character} defines the number of times the bootstrap will resample the data
 #' @return A \code{vector} that contains the confidence intervals of the bootstrap
 #' @author Elena Gagliano
@@ -173,17 +173,28 @@ bootstrap_conf_intervals <- function(X, y, alpha = 0.05, n_bootstraps = 20) {
 #' @title Confusion Matrix
 #'
 #' @description This function creates the confusion matrix that measures the accuracy of the function
-#' @param resp A \code{vector} of dimension n.
-#' @param pred A \code{matrix} containing predictors.
-#' @param beta A \code{vector} containing coefficients.
-#' @param norm A \code{character} defining loss to use (default is `L2`).
-#' @return A \code{numeric} giving value of loss at \code{beta}
+#' @param y_actual \code{vector} containing the actual values of y.
+#' @param y_pred \code{vector} containing predicted values of y.
+#' @param cutoff \code{scaler} creates a cutoff to convert values based on the threshold
+#' @return A \list{numeric} giving measured prevalence, accuracy, and sensitivity of the function
 #' @author Elena Gagliano
 #' @author Helen Wu
 #' @author Max Van Horn
-#' @importFrom stats #put package and then fxn from package you rely on
-#' @export
+#' @importFrom Helen add what you imported
 #' @examples
+#' set.seed(123)
+#' x1 <- rnorm(100)
+#' x2 <- rnorm(100)
+#' x3 <- rnorm(100)
+#' X <- cbind(1,x1, x2, x3) #1 for the intercept term
+#' beta0 <- -1
+#' beta1 <- 2
+#' beta2 <- -0.5
+#' beta3 <- 1.5
+#' true_beta <- matrix(c(beta0, beta1, beta2, beta3), ncol = 1)
+#' p <- 1/(1 + exp(-(X%*%true_beta)))
+#' y <- rbinom(100,1,p)
+#' B_initial <- solve(t(X)%*%X)%*%t(X)%*%y
 y_pred <- log_reg(X,y)$y_pred
 confmat <- function(y_actual, y_pred, cutoff = 0.5){
   #convert predicted values to 0 or 1 based on threshold
@@ -215,17 +226,28 @@ confmat <- function(y_actual, y_pred, cutoff = 0.5){
 #' @title Confusion Matrix Plots
 #'
 #' @description This function plots a grid that includes all of the metrics measured by the confusion matrix
-#' @param resp A \code{vector} of dimension n.
-#' @param pred A \code{matrix} containing predictors.
-#' @param beta A \code{vector} containing coefficients.
-#' @param norm A \code{character} defining loss to use (default is `L2`).
-#' @return A \code{numeric} giving value of loss at \code{beta}
+#' @param resp y \code{vector} of length n.
+#' @param pred X \code{matrix} n number rows beta plus 1 number of columns with first column being entirely ones.
+#' @param cutoff_values \code{vector} a sequence of values from 0.1 to 9.9 separated by 0.1
+#' @return A \plot{numeric} with values for the prevalence, accuracy, sensitivity, and specificity 
 #' @author Elena Gagliano
 #' @author Helen Wu
 #' @author Max Van Horn
 #' @importFrom stats #put package and then fxn from package you rely on
-#' @export
 #' @examples
+#' set.seed(123)
+#' x1 <- rnorm(100)
+#' x2 <- rnorm(100)
+#' x3 <- rnorm(100)
+#' X <- cbind(1,x1, x2, x3) #1 for the intercept term
+#' beta0 <- -1
+#' beta1 <- 2
+#' beta2 <- -0.5
+#' beta3 <- 1.5
+#' true_beta <- matrix(c(beta0, beta1, beta2, beta3), ncol = 1)
+#' p <- 1/(1 + exp(-(X%*%true_beta)))
+#' y <- rbinom(100,1,p)
+#' B_initial <- solve(t(X)%*%X)%*%t(X)%*%y
 plot_metrics <- function(X, y, cutoff_values = seq(0.1, 0.9, by = 0.1)) {
   result <- log_reg(X, y)$betas
   predicted_probs <- pf(t(X), result)
