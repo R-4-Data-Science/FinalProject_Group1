@@ -215,7 +215,7 @@ confmat <- function(y_actual, y_pred, cutoff = 0.5){
   #convert predicted values to 0 or 1 based on threshold
   library(caret)
   y_bin <- ifelse(y_pred >= cutoff, 1,0)
-  cmat <- confusionMatrix(factor(y_actual), factor(y_bin))
+  cmat <- caret::confusionMatrix(factor(y_actual), factor(y_bin))
   metrics <- cmat$byClass
   prevalence <- as.numeric(metrics["Prevalence"])
   accuracy <- as.numeric(cmat$overall["Accuracy"])

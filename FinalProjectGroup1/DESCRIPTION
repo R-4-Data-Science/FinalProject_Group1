@@ -13,3 +13,5 @@ Description: This function obtains different outputs from the procedure by first
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
+RoxygenNote: 7.2.3
+Imports: caret
