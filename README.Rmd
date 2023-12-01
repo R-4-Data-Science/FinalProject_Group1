@@ -9,6 +9,13 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 
+The name of the GitHub Repository is FinalProject-Group1 and the link to it can be found [here](https://github.com/R-4-Data-Science/FinalProject_Group1.git)
+
+The name of the package itself is FinalProjectGroup1
+
+To download the package, type the following into your console:
+devtools::install_github("R-4-Data-Science/FinalProject_Group1/FinalProjectGroup1")
+
 
 ```{r, echo = FALSE}
 
@@ -227,9 +234,6 @@ Here is an example of this function being used with the above calculated metrics
 plotmet <- plot_metrics(X_abalone, y_abalone)
 ```
 
-
-
-### *Include Help documentation for all functions*
 
 
 Sources used on this package can be found [here](https://chat.openai.com/share/48ab81e0-3098-4583-a555-a07d2b50fed1)
