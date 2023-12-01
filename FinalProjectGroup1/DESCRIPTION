@@ -2,8 +2,13 @@ Package: FinalProjectGroup1
 Type: Package
 Title: Logistic Regression Using Optimization
 Version: 0.1.0
-Author: "Elena Gagliano"
-Maintainer: "Max Van Horn" <mtv0012@auburn.edu>
+Authors@R: c(
+    person("Elena", "Gagliano", role = c("aut","cre")),
+    person("Helen", "Wu", role = c("aut","cre")),
+    person("Max", "Van Horn", role = c("aut","cre"))
+    )
+Maintainer: "Max Van Horn" <mtv0012@auburn.edu
+
 Description: This function obtains different outputs from the procedure by first obtaining
     initial values of optimization from the least-squares formula. It then allows the user
     to choose the significance level α to obtain for the 1−α confidence intervals for β. 

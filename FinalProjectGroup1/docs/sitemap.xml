@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>/404.html</loc>
+  </url>
+  <url>
+    <loc>/authors.html</loc>
+  </url>
+  <url>
+    <loc>/index.html</loc>
+  </url>
+  <url>
+    <loc>/reference/bootstrap_conf_intervals.html</loc>
+  </url>
+  <url>
+    <loc>/reference/confmat.html</loc>
+  </url>
+  <url>
+    <loc>/reference/index.html</loc>
+  </url>
+  <url>
+    <loc>/reference/log_reg.html</loc>
+  </url>
+  <url>
+    <loc>/reference/plot.my_b.html</loc>
+  </url>
+  <url>
+    <loc>/reference/plot_metrics.html</loc>
+  </url>
+</urlset>
