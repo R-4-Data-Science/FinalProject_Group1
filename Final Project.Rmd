@@ -14,7 +14,6 @@ knitr::opts_chunk$set(echo = TRUE)
 
 data <- as.data.frame(read.csv("abalone.data"), header = FALSE)
 colnames(data) <- c("Sex", "Length", "Diameter", "Height", "Whole_weight", "Shucked_weight", "Viscera_weight", "Shell_weight", "Rings")
-head(data)
 #remove infant columns so we have binary response variable
 data <- data[data$Sex != "I", ]
 data <- data[1:100, ]
@@ -32,7 +31,7 @@ X_abalone <- X_abalone[1:length(y_abalone), ]
 
 ```
 
-## *Beta Loss function to prepare for logistic regression function*
+#### *Beta Loss Function to Prepare For Logistic Regression Function*
 ```{r loss}
 pf <- function(x, beta){
   out <- 1/(1 + exp(-t(x)%*%beta))
@@ -57,7 +56,7 @@ beta_ls <- function(beta, x, y){
 ```
 
 ## *Logistic Regression with Optimization Function*
-The initial values for optimization were obtained from the least-squares formula (XTX)−1XTy. The parameters for this function should be a matrix of predictors with the first column being 1s to account for the intercept, and a vector for the response variable. The output produces a list consisting of the estimated coefficients (named "betas"), the predicted y-values using the estimated coefficientes (named "y_pred"), the initial y-values (named "y_actual"), and the initial X matrix (named "X").
+The parameters for this function should be a matrix of predictors with the first column being 1s to account for the intercept, and a vector for the response variable. The output produces a list consisting of the estimated coefficients (named "betas"), the predicted y-values using the estimated coefficientes (named "y_pred"), the initial y-values (named "y_actual"), and the initial X matrix (named "X").
 
 ```{r logreg}
 log_reg <- function(X, y){
@@ -75,26 +74,23 @@ log_reg <- function(X, y){
 
 ```
 
-Example using Abalone Dataset
-The response variable is the sex, male denoted as 1 and female denoted with 0. The predictors used are length, diameter, height, whole weight, shucked weight, viscera weight, shell weight and rings. The output from this function returns the estimated beta coefficients for each of the predictors, including the intercept. 
-```{r abalone, echo = FALSE}
+Example using Abalone Data set
+The response variable is the sex, male denoted as 1 and female denoted with 0. The predictors used are length, diameter, height, whole weight, shucked weight, viscera weight, shell weight and rings. The output from the log_reg function returns a list with the estimated beta coefficients for each of the predictors, including the intercept, the predicted sex, the actual sex, and the initial matrix of predictors.
+```{r abalone}
 results <- log_reg(X_abalone, y_abalone)
 results$betas
-
-B_ab <- solve(t(X_abalone)%*%X_abalone)%*%t(X_abalone)%*%y_abalone
-test <- optim(par = B_ab, fn = beta_ls, x = X_abalone, y = y_abalone)
-
-test_pred <- X_abalone%*%test$par
-
+head(results$y_pred)
+head(results$y_actual)
+head(results$X)
 
 ```
 
 
 
 
-### *Plot of the fitted logistic curve to the responses*
+### *Plot of the Fitted Logistic Curve to the Responses*
 
-The y -axis is the binary response observed y while the x-axis represents a sequence of values from the range of Xβ̂, or the predicted y value. 
+The y-axis is the binary response observed y while the x-axis represents a sequence of values from the range of Xβ̂, or the predicted y value. 
 This function uses the output from the log_reg function. To plot the results from the log_reg function, save the results from the function in an object and plot the object using plot(name of object)
 ```{r logplot}
 plot.my_b <- function(obj){
@@ -117,7 +113,7 @@ plot(results)
 
 ```
 
-.
+
 ### *Bootstrap Confidence intervals*
   The user is able to choose (i) the significance level α to obtain for the 1−α confidence intervals for β, and (ii) the number of bootstraps which by default is 20. The parameters for this function include our matrix of predictors, a vector for the response variable, a level of significance (0.05 if not specified), and the number of bootstraps (20 if not specified). This function results in confidence intervals for each of the Beta coefficients.
   
@@ -159,17 +155,12 @@ intervals <- bootstrap_conf_intervals(X_abalone, y_abalone)
 print(intervals)
 ```
 
-### *Generate resulting "Confusion Matrix”*
+### *Generate Resulting Confusion Matrix*
 
 This uses a cut-off value for prediction at 0.5 (i.e. assign value 1 for predictions above 0.5 and value 0 for prediction below or equal to 0.5). Based on this cut-off value, it also outputs the following metrics:
-Prevalence
-Accuracy
-Sensitivity
-Specificity
-False Discovery Rate
-Diagnostic Odds Ratio
+Prevalence, Accuracy, Sensitivity, Specificity, False Discovery Rate, and Diagnostic Odds Ratio
 
-```{r confmat}
+```{r confmat, message = FALSE, warning = FALSE}
 library(caret)
 confmat <- function(y_actual, y_pred, cutoff = 0.5){
   #convert predicted values to 0 or 1 based on threshold
@@ -203,7 +194,7 @@ test
 
 ```
 
-### *Plot above metrics over a grid*
+### *Plot Above Metrics Over A Grid*
 
 The possibility for the user to plot of any of the above metrics evaluated over a grid of cut-off values for prediction going from 0.1 to 0.9 with steps of 0.1.
 

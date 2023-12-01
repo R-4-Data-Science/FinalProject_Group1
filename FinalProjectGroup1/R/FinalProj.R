@@ -107,8 +107,8 @@ plot.my_b <- function(obj){
   lines(x_line, sort(y_line), col = "red", lty = 1, lwd = 2)
 }
 
-test <- log_reg(X, y)
-plot(test)
+#test <- log_reg(X, y)
+#plot(test)
 
 
 ## OUTLINE for bootstrap confidence intervals -- will need to be updated once logistic regression is complete
@@ -152,10 +152,10 @@ bootstrap_conf_intervals <- function(X, y, alpha = 0.05, n_bootstraps = 20) {
 
 
 # Bootstrap confidence intervals
-intervals <- bootstrap_conf_intervals(X, y)
+#intervals <- bootstrap_conf_intervals(X, y)
 
 # Print the resulting intervals
-print(intervals)
+#print(intervals)
 
 
 ##confusion matrix function
@@ -194,7 +194,7 @@ confmat <- function(y_actual, y_pred, cutoff = 0.5){
 
 }
 
-confmat(y, y_pred)
+#confmat(y, y_pred)
 
 
 #plot metrics cut off grid
