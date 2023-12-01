@@ -236,4 +236,11 @@ plotmet <- plot_metrics(X_abalone, y_abalone)
 
 
 
+
 Sources used on this package can be found [here](https://chat.openai.com/share/48ab81e0-3098-4583-a555-a07d2b50fed1)
+
+
+
+Sources used on this package can be found [here](https://chat.openai.com/share/48ab81e0-3098-4583-a555-a07d2b50fed1), [here](https://chat.openai.com/share/70e25e13-a825-426e-b474-0d685d209583), and 
+[here](https://chat.openai.com/share/4d4e8066-9a72-4eba-a268-dcbd26b2db62). 
+
