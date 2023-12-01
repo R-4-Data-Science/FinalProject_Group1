@@ -8,22 +8,119 @@ date: "2023-11-30"
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Logistic Regression using optimization Vignette
 
 
-###*Initial values for optimization obtained from the least-squares formula (XTX)−1XTy*
+```{r, echo = FALSE}
+
+data <- as.data.frame(read.csv("abalone.data"), header = FALSE)
+colnames(data) <- c("Sex", "Length", "Diameter", "Height", "Whole_weight", "Shucked_weight", "Viscera_weight", "Shell_weight", "Rings")
+#remove infant columns so we have binary response variable
+data <- data[data$Sex != "I", ]
+data <- data[1:100, ]
+#convert Male to 1 and Female to 0 
+data$Sex <- ifelse(data$Sex == "M", 1,0)
+
+y_abalone <- data$Sex
+x_columns <- c("Length", "Diameter", "Height", "Whole_weight", "Shucked_weight", "Viscera_weight", "Shell_weight", "Rings")
+X_abalone <- as.matrix(data[x_columns])
+##add a column of ones for the intercept
+X_abalone <- cbind(1, X_abalone)
+X_abalone <- X_abalone[1:length(y_abalone), ]
+
+
+
+```
+
+#### *Beta Loss Function to Prepare For Logistic Regression Function*
+```{r loss}
+pf <- function(x, beta){
+  out <- 1/(1 + exp(-t(x)%*%beta))
+  return(out)
+}
+
+
+beta_ls <- function(beta, x, y){
+  sum <- 0
+  for(i in 1:nrow(x)){
+    xi <- as.matrix(unlist(x[i,]), ncol = 1) #format it so dimensions work out later
+    yi <- y[i]
+    pi <- pf(xi,as.matrix(beta))
+
+
+    res <- (-1*yi)*(log(pi)) - (1 - yi)*log(1-pi)
+    sum <- sum + res
+  }
+  return(sum)
+
+}
+```
+
+## *Logistic Regression with Optimization Function*
+The parameters for this function should be a matrix of predictors with the first column being 1s to account for the intercept, and a vector for the response variable. The output produces a list consisting of the estimated coefficients (named "betas"), the predicted y-values using the estimated coefficientes (named "y_pred"), the initial y-values (named "y_actual"), and the initial X matrix (named "X").
+
+```{r logreg}
+log_reg <- function(X, y){
+  colnames(X)[1] <- "Intercept"
+  B_initial <- solve(t(X)%*%X)%*%t(X)%*%y
+  result <- optim(par = B_initial, fn = beta_ls, x = X, y = y)
+  parameters <- result$par
+  y_pred <- X%*%parameters
+  out <- list("betas" = parameters, "y_pred" = y_pred, "y_actual" = y, "X" = X)
+  class(out) <- "my_b"
+
+  return(out)
+
+}
+
+```
+
+Example using Abalone Data set
+The response variable is the sex, male denoted as 1 and female denoted with 0. The predictors used are length, diameter, height, whole weight, shucked weight, viscera weight, shell weight and rings. The output from the log_reg function returns a list with the estimated beta coefficients for each of the predictors, including the intercept, the predicted sex, the actual sex, and the initial matrix of predictors.
+```{r abalone}
+results <- log_reg(X_abalone, y_abalone)
+results$betas
+head(results$y_pred)
+head(results$y_actual)
+head(results$X)
+
+```
 
 
 
 
-.
+### *Plot of the Fitted Logistic Curve to the Responses*
+
+The y-axis is the binary response observed y while the x-axis represents a sequence of values from the range of Xβ̂, or the predicted y value. 
+This function uses the output from the log_reg function. To plot the results from the log_reg function, save the results from the function in an object and plot the object using plot(name of object)
+```{r logplot}
+plot.my_b <- function(obj){
+  y_pred <- obj$y_pred
+  y_actual <- obj$y_actual
+  X <- obj$X
+  parameters <- obj$parameters
+
+  plot(y_actual ~ y_pred ,xlim = range(y_pred), ylim = range(-.05, 1.5))
+
+  x_line <- seq(min(y_pred), max(y_pred), length = length(y_pred))
+  y_line <- pf(t(X), obj$betas)
+  lines(x_line, sort(y_line), col = "red", lty = 1, lwd = 2)
+}
+```
+
+Here we show the use of the plot() function in this package, using the results from the Abalone data set. 
+```{r logplot_abalone}
+plot(results)
+
+```
+
+
 ### *Bootstrap Confidence intervals*
-  The user is able to choose (i) the significance level α to obtain for the 1−α confidence intervals for β, and (ii)    the number of bootstraps which by default is 20.
+  The user is able to choose (i) the significance level α to obtain for the 1−α confidence intervals for β, and (ii) the number of bootstraps which by default is 20. The parameters for this function include our matrix of predictors, a vector for the response variable, a level of significance (0.05 if not specified), and the number of bootstraps (20 if not specified). This function results in confidence intervals for each of the Beta coefficients.
   
 ```{r bootstrap}
 bootstrap_conf_intervals <- function(X, y, alpha = 0.05, n_bootstraps = 20) {
   n <- nrow(X)
-  beta_bootstraps <- matrix(NA, ncol = n_bootstraps, nrow = length(log_reg(X, y)))
+  beta_bootstraps <- matrix(NA, ncol = n_bootstraps, nrow = length(log_reg(X, y)$betas))
 
   for (i in 1:n_bootstraps) {
     # Sample with replacement
@@ -32,7 +129,7 @@ bootstrap_conf_intervals <- function(X, y, alpha = 0.05, n_bootstraps = 20) {
     y_bootstrap <- y[indices]
 
     # Run logistic regression on the bootstrap sample
-    beta_bootstraps[, i] <- log_reg(X_bootstrap, y_bootstrap)
+    beta_bootstraps[, i] <- log_reg(X_bootstrap, y_bootstrap)$betas
   }
 
   # Calculate confidence intervals
@@ -40,44 +137,71 @@ bootstrap_conf_intervals <- function(X, y, alpha = 0.05, n_bootstraps = 20) {
   upper <- apply(beta_bootstraps, 1, function(row) quantile(row, 1 - alpha / 2))
 
   intervals <- data.frame(lower = lower, upper = upper)
+  rownames(intervals) <- rownames(log_reg(X, y)$betas)
   return(intervals)
 }
 
 
+```  
+
+For example, using the Abalone dataset with different measurements as predictors: 
+
+```{r bootstrap example}
+
 # Bootstrap confidence intervals
-intervals <- bootstrap_conf_intervals(X, y)
+intervals <- bootstrap_conf_intervals(X_abalone, y_abalone)
 
 # Print the resulting intervals
 print(intervals)
-```  
-  
-### *Plot of the fitted logistic curve to the responses*
+```
 
-The y -axis is the binary response y while the x-axis represents a sequence of values from the range of Xβ̂. 
- (see this link or this link for inspiration).
- 
- 
- 
- 
-### *Generate resulting "Confusion Matrix”*
+### *Generate Resulting Confusion Matrix*
 
 This uses a cut-off value for prediction at 0.5 (i.e. assign value 1 for predictions above 0.5 and value 0 for prediction below or equal to 0.5). Based on this cut-off value, it also outputs the following metrics:
-Prevalence
-Accuracy
-Sensitivity
-Specificity
-False Discovery Rate
-Diagnostic Odds Ratio
+Prevalence, Accuracy, Sensitivity, Specificity, False Discovery Rate, and Diagnostic Odds Ratio
 
+```{r confmat, message = FALSE, warning = FALSE}
+library(caret)
+confmat <- function(y_actual, y_pred, cutoff = 0.5){
+  #convert predicted values to 0 or 1 based on threshold
+  y_actual <- factor(y_actual)
+  y_bin <- factor(ifelse(y_pred >= cutoff, 1,0), levels = levels(y_actual))
+  cmat <- confusionMatrix(y_actual, y_bin)
+  metrics <- cmat$byClass
+  prevalence <- as.numeric(metrics["Prevalence"])
+  accuracy <- as.numeric(cmat$overall["Accuracy"])
+  sensitivity <- as.numeric(metrics["Sensitivity"])
+  specificity <- as.numeric(metrics["Specificity"])
+  true_p <- cmat$byClass["Pos Pred Value"] * cmat$byClass["Precision"]
+  false_p <- cmat$byClass["Neg Pred Value"] * cmat$byClass["Precision"]
+  false_discovery_rate <- as.numeric(false_p / (false_p + true_p))
+  diagnostic_odds_ratio <- as.numeric(metrics["Sensitivity"]/(1 - metrics["Specificity"]))
+  
+  out <- invisible(list("Prevalence" = prevalence, "Accuracy" = accuracy, "Sensitivity" = sensitivity, "Specificity" = specificity, "False Discovery Rate" = false_discovery_rate, "Diagnostic Odds Ratio" = diagnostic_odds_ratio))
+  return(out)
 
-### *Plot above metrics over a grid*
+}
+
+```
+
+Here is an example of the output when running the confusion matrix function on the Abalone data set with a cutoff of 0.5. We can use the outputs from the log_reg function to use as the parameters for this function. 
+``` {r }
+y_p <- results$y_pred
+y_a <- results$y_actual
+
+test <- confmat(y_a, y_p)
+test
+
+```
+
+### *Plot Above Metrics Over A Grid*
 
 The possibility for the user to plot of any of the above metrics evaluated over a grid of cut-off values for prediction going from 0.1 to 0.9 with steps of 0.1.
 
 ```{r metrics} 
 plot_metrics <- function(X, y, cutoff_values = seq(0.1, 0.9, by = 0.1)) {
   result <- log_reg(X, y)
-  predicted_probs <- pf(t(X), result)
+  predicted_probs <- pf(t(X), result$betas)
   metrics_matrix <- matrix(NA, nrow = length(cutoff_values), ncol = 7,
                            dimnames = list(NULL, c("Cutoff", "Prevalence", "Accuracy", "Sensitivity", "Specificity", "False Discovery Rate", "Diagnostic Odds Ratio")))
 
@@ -97,9 +221,15 @@ plot_metrics <- function(X, y, cutoff_values = seq(0.1, 0.9, by = 0.1)) {
   }
 }
 
-plot_metrics(X, y)
 ```
+Here is an example of this function being used with the above calculated metrics from the Abalone data set. 
+```{r}
+plotmet <- plot_metrics(X_abalone, y_abalone)
+```
+
+
 
 ### *Include Help documentation for all functions*
 
 
+Sources used on this package can be found [here](https://chat.openai.com/share/48ab81e0-3098-4583-a555-a07d2b50fed1)

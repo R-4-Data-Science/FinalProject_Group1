@@ -59,6 +59,7 @@ beta_ls <- function(beta, x, y){
 #' B_initial <- solve(t(X)%*%X)%*%t(X)%*%y
 
 log_reg <- function(X, y){
+  colnames(X)[1] <- "Intercept"
   B_initial <- solve(t(X)%*%X)%*%t(X)%*%y
   result <- optim(par = B_initial, fn = beta_ls, x = X, y = y)
   parameters <- result$par
@@ -106,8 +107,8 @@ plot.my_b <- function(obj){
   lines(x_line, sort(y_line), col = "red", lty = 1, lwd = 2)
 }
 
-test <- log_reg(X, y)
-plot(test)
+#test <- log_reg(X, y)
+#plot(test)
 
 
 ## OUTLINE for bootstrap confidence intervals -- will need to be updated once logistic regression is complete
@@ -156,15 +157,16 @@ bootstrap_conf_intervals <- function(X, y, alpha = 0.05, n_bootstraps = 20) {
   upper <- apply(beta_bootstraps, 1, function(row) quantile(row, 1 - alpha / 2))
 
   intervals <- data.frame(lower = lower, upper = upper)
+  rownames(intervals) <- rownames(log_reg(X, y)$betas)
   return(intervals)
 }
 
 
 # Bootstrap confidence intervals
-intervals <- bootstrap_conf_intervals(X, y)
+#intervals <- bootstrap_conf_intervals(X, y)
 
 # Print the resulting intervals
-print(intervals)
+#print(intervals)
 
 
 ##confusion matrix function
@@ -182,12 +184,12 @@ print(intervals)
 #' @importFrom stats #put package and then fxn from package you rely on
 #' @export
 #' @examples
-library(caret)
 y_pred <- log_reg(X,y)$y_pred
 confmat <- function(y_actual, y_pred, cutoff = 0.5){
   #convert predicted values to 0 or 1 based on threshold
+  library(caret)
   y_bin <- ifelse(y_pred >= cutoff, 1,0)
-  cmat <- confusionMatrix(factor(y), factor(y_bin))
+  cmat <- confusionMatrix(factor(y_actual), factor(y_bin))
   metrics <- cmat$byClass
   prevalence <- as.numeric(metrics["Prevalence"])
   accuracy <- as.numeric(cmat$overall["Accuracy"])
@@ -203,7 +205,7 @@ confmat <- function(y_actual, y_pred, cutoff = 0.5){
 
 }
 
-confmat(y, y_pred)
+#confmat(y, y_pred)
 
 
 #plot metrics cut off grid
@@ -245,8 +247,6 @@ plot_metrics <- function(X, y, cutoff_values = seq(0.1, 0.9, by = 0.1)) {
 
   }
 }
-
-plot_metrics(X, y)
 
 
 
