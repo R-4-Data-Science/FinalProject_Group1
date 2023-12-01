@@ -225,10 +225,11 @@ plot_metrics <- function(X, y, cutoff_values = seq(0.1, 0.9, by = 0.1)) {
 Here is an example of this function being used with the above calculated metrics from the Abalone data set. 
 ```{r}
 plotmet <- plot_metrics(X_abalone, y_abalone)
-
-
 ```
+
+
 
 ### *Include Help documentation for all functions*
 
 
+Sources used on this package can be found [here](https://chat.openai.com/share/48ab81e0-3098-4583-a555-a07d2b50fed1)
